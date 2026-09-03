@@ -49,6 +49,8 @@
       <!-- System / computer eyes area -->
       <section id="system-area" aria-labelledby="system-label">
         <h2 id="system-label">System Eyes</h2>
+
+        <!-- System state remains hidden during this milestone -->
         <div id="system-eye-visual" aria-hidden="true">👀</div>
         <p id="system-eye-state">???</p>
       </section>
@@ -56,18 +58,32 @@
       <!-- Player choice area -->
       <section id="player-choice-area" aria-labelledby="player-choice-label">
         <h2 id="player-choice-label">Your Claim</h2>
-        <button id="choice-open" class="choice-button" type="button">OPEN 👀</button>
-        <button id="choice-closed" class="choice-button" type="button">CLOSED 😑</button>
+
+        <button
+          id="choice-open"
+          class="choice-button"
+          type="button"
+        >
+          OPEN 👀
+        </button>
+
+        <button
+          id="choice-closed"
+          class="choice-button"
+          type="button"
+        >
+          CLOSED 😑
+        </button>
       </section>
 
-      <!-- Countdown -->
-      <section id="countdown-area" aria-live="polite">
+      <!-- Countdown - not part of this milestone -->
+      <section id="countdown-area" aria-live="polite" hidden>
         <h2 id="countdown-label">Countdown</h2>
         <p id="countdown-number">3</p>
       </section>
 
-      <!-- Reveal / result -->
-      <section id="reveal-area" aria-live="polite">
+      <!-- Reveal / result - not part of this milestone -->
+      <section id="reveal-area" aria-live="polite" hidden>
         <h2 id="reveal-label">Reveal</h2>
         <p id="reveal-system-state"></p>
         <p id="reveal-survival-state"></p>
@@ -75,8 +91,8 @@
         <p id="reveal-caught-state"></p>
       </section>
 
-      <!-- Result states (JS will show/hide these later) -->
-      <section id="result-states">
+      <!-- Result states - not part of this milestone -->
+      <section id="result-states" hidden>
 
         <div id="result-safe" class="result-container" hidden>
           <p>You played it safe. No point earned, but you survived.</p>
@@ -102,13 +118,10 @@
       <!-- Controls -->
       <section id="game-controls" aria-labelledby="controls-label">
         <h2 id="controls-label">Controls</h2>
+
         <ul id="controls-list">
-          <li><kbd>ENTER</kbd> — Start / continue after an OPEN-risk round</li>
-          <li><kbd>O</kbd> — Claim eyes are OPEN</li>
-          <li><kbd>C</kbd> — Claim eyes are CLOSED</li>
-          <li><kbd>SPACE</kbd> — Continue after choosing CLOSED</li>
-          <li><kbd>SHIFT</kbd> — End the current game</li>
-          <li><kbd>R</kbd> — Restart after game over</li>
+          <li><kbd>ENTER</kbd> — Claim eyes are OPEN</li>
+          <li><kbd>SPACE</kbd> — Claim eyes are CLOSED</li>
         </ul>
       </section>
 
@@ -125,12 +138,23 @@
     </header>
 
     <main>
-      <p id="final-score">Final Score: <span id="final-score-value">0</span></p>
-      <p id="rounds-survived">Rounds Survived: <span id="rounds-survived-value">0</span></p>
-      <p id="final-high-score">High Score: <span id="final-high-score-value">0</span></p>
+      <p id="final-score">
+        Final Score: <span id="final-score-value">0</span>
+      </p>
+
+      <p id="rounds-survived">
+        Rounds Survived: <span id="rounds-survived-value">0</span>
+      </p>
+
+      <p id="final-high-score">
+        High Score: <span id="final-high-score-value">0</span>
+      </p>
 
       <button id="restart-button" type="button">Restart</button>
-      <p id="restart-instruction">Press <kbd>R</kbd> to restart</p>
+
+      <p id="restart-instruction">
+        Press <kbd>R</kbd> to restart
+      </p>
     </main>
   </section>
 
@@ -138,7 +162,9 @@
   <!-- HONOR SYSTEM NOTICE (GLOBAL) -->
   <!-- ============================== -->
   <footer id="honor-system-notice">
-    <p>🔐 HONOR SYSTEM ACTIVE — We have absolutely no idea if you're telling the truth.</p>
+    <p>
+      🔐 HONOR SYSTEM ACTIVE — We have absolutely no idea if you're telling the truth.
+    </p>
   </footer>
 
   <script src="script.js" defer></script>
