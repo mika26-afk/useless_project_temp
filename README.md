@@ -10,9 +10,8 @@
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Member 1: Swaratmika V - LBS Institute of Technology for Women 
+- Member 2: Aabiya Fathima - LBS Institute of Technology for Women
 
 ### Project Description
 Eye Roulette is a casino-style game where you gamble on whether the computer will open or close its eyes—and hope you don't "lock eyes." 
@@ -27,19 +26,35 @@ A casino-style game where the digital screen randomly opens or closes its eyes, 
 ## Technical Details
 ### Technologies/Components Used
 For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
+- Languages used: HTML5, CSS3, JavaScript (Vanilla JS)
+- Frameworks used: None
+- Libraries used: None
+- Tools used: VS Code, Git/GitHub, Web Browser, LocalStorage API
 
 
 ### Implementation
 For Software:
+Built a browser-based retro pixel-art arcade game using semantic HTML, custom CSS, and vanilla JavaScript.
+Implemented the game state and scoring system entirely on the client side.
+Added a vertical slot-reel animation for the system's eye reveal.
+Used randomized systemChoice logic to determine whether the system chooses OPEN or CLOSED.
+Implemented the four core gameplay outcomes:
+OPEN + OPEN → Game Over, +0
+OPEN + CLOSED → Survive, +1
+CLOSED + OPEN → Survive, +0
+CLOSED + CLOSED → Survive, +0
+Added keyboard controls for ENTER, SPACE, SHIFT, and R.
+Added persistent high-score tracking using localStorage.
+Added randomized sarcastic roast/status messages to give the game its playful personality.
+Designed the interface around a retro arcade aesthetic with pixel typography, CRT-inspired visuals, arcade HUD elements, and responsive layouts.
+Optimized the gameplay interface to fit within a single viewport without requiring scrolling.
+
 # Installation
-[commands]
+No installation or dependencies are required
 
 # Run
-[commands]
+Open index.html directly in a web browser.
+Or, if using VS Code, launch the project with Live Server and open the provided local URL.
 
 ### Project Documentation
 For Software:

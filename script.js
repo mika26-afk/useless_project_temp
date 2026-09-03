@@ -18,6 +18,270 @@ let continueKey = null;
 
 
 // ==============================
+// LIGHTWEIGHT ARCADE SOUNDS
+// ==============================
+
+let audioContext = null;
+let audioMaster = null;
+
+
+function initAudio() {
+
+  if (audioContext) {
+    return;
+  }
+
+  try {
+
+    const AudioContext =
+      window.AudioContext ||
+      window.webkitAudioContext;
+
+    if (!AudioContext) {
+      return;
+    }
+
+    audioContext =
+      new AudioContext();
+
+    audioMaster =
+      audioContext.createGain();
+
+    audioMaster.gain.value =
+      0.12;
+
+    audioMaster.connect(
+      audioContext.destination
+    );
+
+  } catch (error) {
+
+    /*
+      Sound is optional.
+      If the browser does not support
+      Web Audio, the game still works.
+    */
+
+    audioContext = null;
+    audioMaster = null;
+
+  }
+
+}
+
+
+function playTone(
+  frequency,
+  duration = 0.08,
+  type = "square",
+  volume = 0.5
+) {
+
+  if (
+    !audioContext ||
+    !audioMaster
+  ) {
+
+    return;
+
+  }
+
+
+  try {
+
+    /*
+      Resume the audio context if the
+      browser initially suspended it.
+    */
+
+    if (
+      audioContext.state ===
+      "suspended"
+    ) {
+
+      audioContext
+        .resume()
+        .catch(() => {});
+
+    }
+
+
+    const oscillator =
+      audioContext.createOscillator();
+
+    const gain =
+      audioContext.createGain();
+
+
+    oscillator.type =
+      type;
+
+
+    oscillator.frequency.value =
+      frequency;
+
+
+    const now =
+      audioContext.currentTime;
+
+
+    gain.gain.setValueAtTime(
+      0,
+      now
+    );
+
+
+    gain.gain.linearRampToValueAtTime(
+      volume,
+      now + 0.005
+    );
+
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      now + duration
+    );
+
+
+    oscillator.connect(gain);
+
+    gain.connect(audioMaster);
+
+
+    oscillator.start();
+
+
+    oscillator.stop(
+      now + duration
+    );
+
+  } catch (error) {
+
+    /*
+      Never allow audio errors to
+      interfere with the game.
+    */
+
+  }
+
+}
+
+
+function playStartSound() {
+
+  playTone(
+    520,
+    0.08
+  );
+
+  playTone(
+    780,
+    0.12
+  );
+
+}
+
+
+function playChoiceSound() {
+
+  playTone(
+    440,
+    0.07
+  );
+
+}
+
+
+function playSpinSound() {
+
+  /*
+    Only ONE short sound when the reel
+    begins.
+
+    No continuous audio loop.
+  */
+
+  playTone(
+    180,
+    0.06,
+    "square",
+    0.35
+  );
+
+}
+
+
+function playRevealSound() {
+
+  playTone(
+    620,
+    0.08
+  );
+
+  playTone(
+    900,
+    0.12
+  );
+
+}
+
+
+function playPointSound() {
+
+  playTone(
+    660,
+    0.07
+  );
+
+  playTone(
+    880,
+    0.10
+  );
+
+  playTone(
+    1100,
+    0.13
+  );
+
+}
+
+
+function playSafeSound() {
+
+  playTone(
+    420,
+    0.09
+  );
+
+  playTone(
+    520,
+    0.11
+  );
+
+}
+
+
+function playGameOverSound() {
+
+  playTone(
+    300,
+    0.12
+  );
+
+  playTone(
+    220,
+    0.16
+  );
+
+  playTone(
+    150,
+    0.20
+  );
+
+}
+
+
+// ==============================
 // SLOT REEL STATE
 // ==============================
 
@@ -29,7 +293,8 @@ let isReelSpinning = false;
 // HIGH SCORE
 // ==============================
 
-const HIGH_SCORE_KEY = "eyeRouletteHighScore";
+const HIGH_SCORE_KEY =
+  "eyeRouletteHighScore";
 
 let highScore = 0;
 
@@ -202,7 +467,10 @@ let lastRoastIndex = -1;
 function getRandomMessage(messageList) {
 
   const randomIndex =
-    Math.floor(Math.random() * messageList.length);
+    Math.floor(
+      Math.random() *
+      messageList.length
+    );
 
   return messageList[randomIndex];
 
@@ -236,14 +504,10 @@ function getRandomRoast(category) {
 
   let randomIndex =
     Math.floor(
-      Math.random() * roastList.length
+      Math.random() *
+      roastList.length
     );
 
-
-  /*
-    Avoid immediately repeating the
-    previous roast.
-  */
 
   while (
     randomIndex === lastRoastIndex
@@ -251,7 +515,8 @@ function getRandomRoast(category) {
 
     randomIndex =
       Math.floor(
-        Math.random() * roastList.length
+        Math.random() *
+        roastList.length
       );
 
   }
@@ -278,11 +543,6 @@ function showRoast(message) {
   statusMessage.textContent =
     message;
 
-
-  /*
-    Restart the CSS animation so every
-    new roast gets a small arcade pop.
-  */
 
   statusMessage.classList.remove(
     "roast-pop"
@@ -321,118 +581,186 @@ function pulseScoreDisplay() {
 // ==============================
 
 const startScreen =
-  document.getElementById("start-screen");
+  document.getElementById(
+    "start-screen"
+  );
 
 const startButton =
-  document.getElementById("start-button");
+  document.getElementById(
+    "start-button"
+  );
 
 
 const gameScreen =
-  document.getElementById("game-screen");
+  document.getElementById(
+    "game-screen"
+  );
 
 
 const roundNumberDisplay =
-  document.getElementById("round-number");
+  document.getElementById(
+    "round-number"
+  );
 
 const currentScoreDisplay =
-  document.getElementById("current-score");
+  document.getElementById(
+    "current-score"
+  );
 
 const highScoreDisplay =
-  document.getElementById("high-score");
+  document.getElementById(
+    "high-score"
+  );
 
 
 const systemEyeVisual =
-  document.getElementById("system-eye-visual");
+  document.getElementById(
+    "system-eye-visual"
+  );
 
 const systemEyeState =
-  document.getElementById("system-eye-state");
+  document.getElementById(
+    "system-eye-state"
+  );
 
 
 const systemSlotMachine =
-  document.getElementById("system-slot-machine");
+  document.getElementById(
+    "system-slot-machine"
+  );
 
 const slotStatus =
-  document.getElementById("slot-status");
+  document.getElementById(
+    "slot-status"
+  );
 
 
 const choiceOpenButton =
-  document.getElementById("choice-open");
+  document.getElementById(
+    "choice-open"
+  );
 
 const choiceClosedButton =
-  document.getElementById("choice-closed");
+  document.getElementById(
+    "choice-closed"
+  );
 
 
 const countdownArea =
-  document.getElementById("countdown-area");
+  document.getElementById(
+    "countdown-area"
+  );
 
 const countdownNumber =
-  document.getElementById("countdown-number");
+  document.getElementById(
+    "countdown-number"
+  );
 
 
 const revealArea =
-  document.getElementById("reveal-area");
+  document.getElementById(
+    "reveal-area"
+  );
 
 const revealSystemState =
-  document.getElementById("reveal-system-state");
+  document.getElementById(
+    "reveal-system-state"
+  );
 
 const revealSurvivalState =
-  document.getElementById("reveal-survival-state");
+  document.getElementById(
+    "reveal-survival-state"
+  );
 
 const revealPointState =
-  document.getElementById("reveal-point-state");
+  document.getElementById(
+    "reveal-point-state"
+  );
 
 const revealCaughtState =
-  document.getElementById("reveal-caught-state");
+  document.getElementById(
+    "reveal-caught-state"
+  );
 
 
 const resultStates =
-  document.getElementById("result-states");
+  document.getElementById(
+    "result-states"
+  );
 
 const resultSafe =
-  document.getElementById("result-safe");
+  document.getElementById(
+    "result-safe"
+  );
 
 const resultPoint =
-  document.getElementById("result-point");
+  document.getElementById(
+    "result-point"
+  );
 
 const resultClosedSafe =
-  document.getElementById("result-closed-safe");
+  document.getElementById(
+    "result-closed-safe"
+  );
 
 const resultGameOver =
-  document.getElementById("result-game-over");
+  document.getElementById(
+    "result-game-over"
+  );
 
 
 const statusMessage =
-  document.getElementById("status-message");
+  document.getElementById(
+    "status-message"
+  );
 
 
 const gameOverScreen =
-  document.getElementById("game-over-screen");
+  document.getElementById(
+    "game-over-screen"
+  );
 
 const gameOverHeading =
-  document.getElementById("game-over-heading");
+  document.getElementById(
+    "game-over-heading"
+  );
 
 const gameOverMessage =
-  document.getElementById("game-over-message");
+  document.getElementById(
+    "game-over-message"
+  );
 
 const gameOverSubmessage =
-  document.getElementById("game-over-submessage");
+  document.getElementById(
+    "game-over-submessage"
+  );
 
 
 const finalScoreValue =
-  document.getElementById("final-score-value");
+  document.getElementById(
+    "final-score-value"
+  );
 
 const roundsSurvivedValue =
-  document.getElementById("rounds-survived-value");
+  document.getElementById(
+    "rounds-survived-value"
+  );
 
 const finalHighScoreValue =
-  document.getElementById("final-high-score-value");
+  document.getElementById(
+    "final-high-score-value"
+  );
 
 const newHighScoreMessage =
-  document.getElementById("new-high-score-message");
+  document.getElementById(
+    "new-high-score-message"
+  );
 
 
 const restartButton =
-  document.getElementById("restart-button");
+  document.getElementById(
+    "restart-button"
+  );
 
 
 // ==============================
@@ -444,14 +772,19 @@ function loadHighScore() {
   try {
 
     const savedHighScore =
-      localStorage.getItem(HIGH_SCORE_KEY);
+      localStorage.getItem(
+        HIGH_SCORE_KEY
+      );
 
 
-    if (savedHighScore === null) {
+    if (
+      savedHighScore === null
+    ) {
 
       highScore = 0;
 
       return;
+
     }
 
 
@@ -493,7 +826,7 @@ function saveHighScore() {
 
   } catch (error) {
 
-    // Game continues even if localStorage is unavailable.
+    // Game continues normally.
 
   }
 
@@ -529,7 +862,8 @@ function checkForNewHighScore() {
   updateHighScoreDisplay();
 
 
-  return score > previousHighScore;
+  return score >
+    previousHighScore;
 
 }
 
@@ -595,13 +929,6 @@ function getTargetReelPosition() {
   let targetIndex = -1;
 
 
-  /*
-    Find the LAST matching symbol.
-
-    This makes the reel travel through
-    multiple symbols before stopping.
-  */
-
   for (
     let i = symbols.length - 1;
     i >= 0;
@@ -609,7 +936,8 @@ function getTargetReelPosition() {
   ) {
 
     if (
-      symbols[i].textContent === targetEmoji
+      symbols[i].textContent ===
+      targetEmoji
     ) {
 
       targetIndex = i;
@@ -621,27 +949,24 @@ function getTargetReelPosition() {
   }
 
 
-  if (targetIndex === -1) {
+  if (
+    targetIndex === -1
+  ) {
 
     targetIndex = 0;
 
   }
 
 
-  /*
-    Measure the actual rendered dimensions
-    instead of assuming 150px.
-
-    This preserves the exact landing position
-    on mobile where the CSS reel is 140px tall.
-  */
-
   const firstSymbol =
     symbols[0];
 
+
   const symbolHeight =
     firstSymbol
-      ? firstSymbol.getBoundingClientRect().height
+      ? firstSymbol
+          .getBoundingClientRect()
+          .height
       : 150;
 
 
@@ -651,12 +976,15 @@ function getTargetReelPosition() {
 
   const windowHeight =
     slotWindow
-      ? slotWindow.getBoundingClientRect().height
+      ? slotWindow
+          .getBoundingClientRect()
+          .height
       : symbolHeight;
 
 
   const centerOffset =
-    (windowHeight - symbolHeight) / 2;
+    (windowHeight - symbolHeight) /
+    2;
 
 
   return (
@@ -669,11 +997,6 @@ function getTargetReelPosition() {
 
 function startSlotReelAnimation() {
 
-  /*
-    Never start another animation while
-    one is already running.
-  */
-
   if (
     isReelSpinning ||
     systemChoice === null
@@ -685,6 +1008,14 @@ function startSlotReelAnimation() {
 
 
   isReelSpinning = true;
+
+
+  /*
+    Only one tiny sound.
+    No audio loop.
+  */
+
+  playSpinSound();
 
 
   systemSlotMachine.classList.remove(
@@ -705,17 +1036,12 @@ function startSlotReelAnimation() {
   );
 
 
-  /*
-    Start from a known position.
-  */
-
   prepareSlotReel();
 
 
   /*
-    Force browser reflow so the starting
-    position is actually applied before
-    the animation begins.
+    Force layout before applying
+    the reel transition.
   */
 
   void systemEyeVisual.offsetHeight;
@@ -724,14 +1050,6 @@ function startSlotReelAnimation() {
   const finalPosition =
     getTargetReelPosition();
 
-
-  /*
-    Fast beginning → smooth deceleration
-    → final settle.
-
-    This is the existing vertical reel
-    animation and remains unchanged.
-  */
 
   systemEyeVisual.style.transition =
     "transform 2.65s cubic-bezier(0.12, 0.75, 0.18, 1)";
@@ -763,19 +1081,25 @@ function finishSlotReelAnimation() {
   isReelSpinning = false;
 
 
-  if (reelAnimation !== null) {
+  if (
+    reelAnimation !== null
+  ) {
 
-    clearTimeout(reelAnimation);
+    clearTimeout(
+      reelAnimation
+    );
 
     reelAnimation = null;
 
   }
 
 
+  playRevealSound();
+
+
   systemSlotMachine.classList.remove(
     "spinning"
   );
-
 
   systemSlotMachine.classList.add(
     "revealed"
@@ -787,23 +1111,16 @@ function finishSlotReelAnimation() {
 
 
   /*
-    IMPORTANT:
+    The animation NEVER decides
+    the system result.
 
-    The animation NEVER decides the result.
-
-    systemChoice was already determined
+    systemChoice was already selected
     before the animation started.
   */
 
   systemEyeState.textContent =
     systemChoice;
 
-
-  /*
-    Briefly emphasize the symbol that
-    corresponds to the already-decided
-    systemChoice.
-  */
 
   const symbols =
     systemEyeVisual.querySelectorAll(
@@ -826,10 +1143,15 @@ function finishSlotReelAnimation() {
   });
 
 
-  for (let i = symbols.length - 1; i >= 0; i--) {
+  for (
+    let i = symbols.length - 1;
+    i >= 0;
+    i--
+  ) {
 
     if (
-      symbols[i].textContent === targetEmoji
+      symbols[i].textContent ===
+      targetEmoji
     ) {
 
       symbols[i].classList.add(
@@ -847,9 +1169,13 @@ function finishSlotReelAnimation() {
 
 function resetSlotReel() {
 
-  if (reelAnimation !== null) {
+  if (
+    reelAnimation !== null
+  ) {
 
-    clearTimeout(reelAnimation);
+    clearTimeout(
+      reelAnimation
+    );
 
     reelAnimation = null;
 
@@ -883,6 +1209,19 @@ function resetSlotReel() {
 
 function startGame() {
 
+  /*
+    Initialize audio from the user's
+    click/ENTER action.
+
+    This is the safest browser-compatible
+    place to start Web Audio.
+  */
+
+  initAudio();
+
+  playStartSound();
+
+
   score = 0;
 
   roundNumber = 1;
@@ -906,14 +1245,18 @@ function startGame() {
   continueKey = null;
 
 
-  startScreen.hidden = true;
+  startScreen.hidden =
+    true;
 
-  gameScreen.hidden = false;
+  gameScreen.hidden =
+    false;
 
-  gameOverScreen.hidden = true;
+  gameOverScreen.hidden =
+    true;
 
 
-  newHighScoreMessage.hidden = true;
+  newHighScoreMessage.hidden =
+    true;
 
 
   updateHighScoreDisplay();
@@ -954,25 +1297,34 @@ function startRound() {
   resetSlotReel();
 
 
-  countdownArea.hidden = true;
+  countdownArea.hidden =
+    true;
 
-  revealArea.hidden = true;
+  revealArea.hidden =
+    true;
 
-  resultStates.hidden = true;
-
-
-  resultSafe.hidden = true;
-
-  resultPoint.hidden = true;
-
-  resultClosedSafe.hidden = true;
-
-  resultGameOver.hidden = true;
+  resultStates.hidden =
+    true;
 
 
-  choiceOpenButton.disabled = false;
+  resultSafe.hidden =
+    true;
 
-  choiceClosedButton.disabled = false;
+  resultPoint.hidden =
+    true;
+
+  resultClosedSafe.hidden =
+    true;
+
+  resultGameOver.hidden =
+    true;
+
+
+  choiceOpenButton.disabled =
+    false;
+
+  choiceClosedButton.disabled =
+    false;
 
 
   choiceOpenButton.classList.remove(
@@ -1036,8 +1388,8 @@ function startNextRound() {
 function selectPlayerChoice(choice) {
 
   /*
-    Prevent choices while a round is
-    already running.
+    Prevent choices while the round
+    is already running.
   */
 
   if (
@@ -1055,7 +1407,16 @@ function selectPlayerChoice(choice) {
   playerChoice = choice;
 
 
-  if (choice === "OPEN") {
+  /*
+    Short button/choice sound.
+  */
+
+  playChoiceSound();
+
+
+  if (
+    choice === "OPEN"
+  ) {
 
     choiceOpenButton.classList.add(
       "selected"
@@ -1068,7 +1429,9 @@ function selectPlayerChoice(choice) {
   }
 
 
-  if (choice === "CLOSED") {
+  if (
+    choice === "CLOSED"
+  ) {
 
     choiceClosedButton.classList.add(
       "selected"
@@ -1081,18 +1444,20 @@ function selectPlayerChoice(choice) {
   }
 
 
-  choiceOpenButton.disabled = true;
+  choiceOpenButton.disabled =
+    true;
 
-  choiceClosedButton.disabled = true;
+  choiceClosedButton.disabled =
+    true;
 
 
   /*
     IMPORTANT:
 
-    The actual system result is decided
-    BEFORE the reel animation starts.
+    Decide the system result BEFORE
+    the reel animation starts.
 
-    The reel only reveals this result.
+    The reel only reveals it.
   */
 
   systemChoice =
@@ -1122,17 +1487,21 @@ function startCountdown() {
   }
 
 
-  if (systemChoice === null) {
+  if (
+    systemChoice === null
+  ) {
 
     return;
 
   }
 
 
-  isCountdownActive = true;
+  isCountdownActive =
+    true;
 
 
-  countdownArea.hidden = false;
+  countdownArea.hidden =
+    false;
 
   countdownNumber.textContent =
     "3";
@@ -1144,7 +1513,8 @@ function startCountdown() {
 
 
   /*
-    Start the casino reel immediately.
+    Start the vertical casino reel
+    immediately.
   */
 
   startSlotReelAnimation();
@@ -1159,7 +1529,9 @@ function startCountdown() {
       countdownValue -= 1;
 
 
-      if (countdownValue > 0) {
+      if (
+        countdownValue > 0
+      ) {
 
         countdownNumber.textContent =
           countdownValue;
@@ -1169,26 +1541,28 @@ function startCountdown() {
       }
 
 
-      clearInterval(countdownInterval);
+      clearInterval(
+        countdownInterval
+      );
 
       countdownInterval = null;
 
 
-      countdownArea.hidden = true;
+      countdownArea.hidden =
+        true;
 
-      isCountdownActive = false;
+      isCountdownActive =
+        false;
 
 
       /*
-        The reel lasts 2.65 seconds,
-        while the countdown lasts 3 seconds.
-
-        This ensures the reel has already
-        finished by the time we reveal
-        the actual game result.
+        Reel lasts 2.65 seconds.
+        Countdown lasts 3 seconds.
       */
 
-      if (isReelSpinning) {
+      if (
+        isReelSpinning
+      ) {
 
         finishSlotReelAnimation();
 
@@ -1213,7 +1587,9 @@ function startCountdown() {
 
 function revealResult() {
 
-  if (systemChoice === null) {
+  if (
+    systemChoice === null
+  ) {
 
     return;
 
@@ -1221,14 +1597,15 @@ function revealResult() {
 
 
   /*
-    Make absolutely sure the reel has
-    finished before showing the result.
+    Make absolutely sure the reel
+    has finished before the result.
   */
 
   finishSlotReelAnimation();
 
 
-  revealArea.hidden = false;
+  revealArea.hidden =
+    false;
 
 
   systemEyeState.textContent =
@@ -1250,17 +1627,21 @@ function revealResult() {
 
 function calculateResult() {
 
-  if (resultProcessed) {
+  if (
+    resultProcessed
+  ) {
 
     return;
 
   }
 
 
-  resultProcessed = true;
+  resultProcessed =
+    true;
 
 
-  resultStates.hidden = false;
+  resultStates.hidden =
+    false;
 
 
   const funnyMessage =
@@ -1306,7 +1687,11 @@ function calculateResult() {
       false;
 
 
-    gameOver = true;
+    gameOver =
+      true;
+
+
+    playGameOverSound();
 
 
     showGameOver();
@@ -1327,6 +1712,10 @@ function calculateResult() {
   ) {
 
     score += 1;
+
+
+    playPointSound();
+
 
     roundsSurvived += 1;
 
@@ -1380,6 +1769,9 @@ function calculateResult() {
     roundsSurvived += 1;
 
 
+    playSafeSound();
+
+
     revealSurvivalState.textContent =
       "You survived by keeping your eyes closed.";
 
@@ -1420,6 +1812,9 @@ function calculateResult() {
   ) {
 
     roundsSurvived += 1;
+
+
+    playSafeSound();
 
 
     revealSurvivalState.textContent =
@@ -1510,18 +1905,26 @@ function showGameOver() {
 
 function restartGame() {
 
-  if (countdownInterval !== null) {
+  if (
+    countdownInterval !== null
+  ) {
 
-    clearInterval(countdownInterval);
+    clearInterval(
+      countdownInterval
+    );
 
     countdownInterval = null;
 
   }
 
 
-  if (reelAnimation !== null) {
+  if (
+    reelAnimation !== null
+  ) {
 
-    clearTimeout(reelAnimation);
+    clearTimeout(
+      reelAnimation
+    );
 
     reelAnimation = null;
 
@@ -1540,15 +1943,20 @@ function restartGame() {
   systemChoice = null;
 
 
-  isCountdownActive = false;
+  isCountdownActive =
+    false;
 
-  isReelSpinning = false;
+  isReelSpinning =
+    false;
 
-  resultProcessed = false;
+  resultProcessed =
+    false;
 
-  gameOver = false;
+  gameOver =
+    false;
 
-  continueKey = null;
+  continueKey =
+    null;
 
 
   resetSlotReel();
@@ -1587,7 +1995,9 @@ choiceOpenButton.addEventListener(
   "click",
   () => {
 
-    selectPlayerChoice("OPEN");
+    selectPlayerChoice(
+      "OPEN"
+    );
 
   }
 );
@@ -1597,7 +2007,9 @@ choiceClosedButton.addEventListener(
   "click",
   () => {
 
-    selectPlayerChoice("CLOSED");
+    selectPlayerChoice(
+      "CLOSED"
+    );
 
   }
 );
@@ -1621,13 +2033,17 @@ document.addEventListener(
     // ENTER
     // ==========================
 
-    if (event.key === "Enter") {
+    if (
+      event.key === "Enter"
+    ) {
 
       /*
         Start game.
       */
 
-      if (!startScreen.hidden) {
+      if (
+        !startScreen.hidden
+      ) {
 
         startGame();
 
@@ -1647,7 +2063,9 @@ document.addEventListener(
         playerChoice === null
       ) {
 
-        selectPlayerChoice("OPEN");
+        selectPlayerChoice(
+          "OPEN"
+        );
 
         return;
 
@@ -1655,7 +2073,8 @@ document.addEventListener(
 
 
       /*
-        Continue after OPEN + CLOSED.
+        Continue after
+        OPEN + CLOSED.
       */
 
       if (
@@ -1678,7 +2097,9 @@ document.addEventListener(
     // SPACE
     // ==========================
 
-    if (event.code === "Space") {
+    if (
+      event.code === "Space"
+    ) {
 
       event.preventDefault();
 
@@ -1694,7 +2115,9 @@ document.addEventListener(
         playerChoice === null
       ) {
 
-        selectPlayerChoice("CLOSED");
+        selectPlayerChoice(
+          "CLOSED"
+        );
 
         return;
 
@@ -1702,7 +2125,8 @@ document.addEventListener(
 
 
       /*
-        Continue after CLOSED result.
+        Continue after
+        CLOSED result.
       */
 
       if (
@@ -1740,11 +2164,13 @@ document.addEventListener(
     // SHIFT
     // ==========================
 
-    if (event.key === "Shift") {
+    if (
+      event.key === "Shift"
+    ) {
 
       /*
-        Existing SHIFT behavior remains
-        unchanged.
+        Existing SHIFT behavior
+        remains unchanged.
       */
 
       return;
