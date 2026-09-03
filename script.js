@@ -16,6 +16,11 @@ let gameOver = false;
 
 let continueKey = null;
 
+// Each new round gets a new token.
+// Async callbacks must match the current token
+// before they are allowed to change game state.
+let roundToken = 0;
+
 
 // ==============================
 // OVERLAY STATE
@@ -23,6 +28,7 @@ let continueKey = null;
 
 let resultOverlayTimeout = null;
 let resultOverlay = null;
+let resultOverlayVisible = false;
 
 
 // ==============================
@@ -1057,10 +1063,6 @@ function showResultOverlay(
     );
 
 
-  // ==============================
-  // EYE CONTACT
-  // ==============================
-
   if (
     type === "eye-contact"
   ) {
@@ -1089,10 +1091,6 @@ function showResultOverlay(
 
   }
 
-
-  // ==============================
-  // POINT
-  // ==============================
 
   if (
     type === "point"
@@ -1123,10 +1121,6 @@ function showResultOverlay(
   }
 
 
-  // ==============================
-  // SAFE
-  // ==============================
-
   if (
     type === "safe"
   ) {
@@ -1156,9 +1150,9 @@ function showResultOverlay(
   }
 
 
-  // ==============================
-  // SHOW
-  // ==============================
+  resultOverlayVisible =
+    true;
+
 
   resultOverlay.style.opacity =
     "1";
@@ -1171,14 +1165,13 @@ function showResultOverlay(
     "scale(1)";
 
 
-  // ==============================
-  // SINGLE TIMER
-  // ==============================
-
   resultOverlayTimeout =
     setTimeout(() => {
 
       resultOverlayTimeout = null;
+
+      resultOverlayVisible =
+        false;
 
       hideResultOverlay();
 
@@ -1200,8 +1193,16 @@ function showResultOverlay(
 function hideResultOverlay() {
 
   if (!resultOverlay) {
+    resultOverlayVisible =
+      false;
+
     return;
+
   }
+
+
+  resultOverlayVisible =
+    false;
 
 
   resultOverlay.style.opacity =
@@ -1272,6 +1273,9 @@ function clearActiveTimers() {
     false;
 
   isReelSpinning =
+    false;
+
+  resultOverlayVisible =
     false;
 
 
@@ -1527,6 +1531,10 @@ function startSlotReelAnimation() {
   }
 
 
+  const thisRound =
+    roundToken;
+
+
   isReelSpinning =
     true;
 
@@ -1573,14 +1581,36 @@ function startSlotReelAnimation() {
   reelAnimation =
     setTimeout(() => {
 
-      finishSlotReelAnimation();
+      if (
+        thisRound !== roundToken
+      ) {
+
+        return;
+
+      }
+
+
+      finishSlotReelAnimation(
+        thisRound
+      );
 
     }, 2650);
 
 }
 
 
-function finishSlotReelAnimation() {
+function finishSlotReelAnimation(
+  expectedRound = roundToken
+) {
+
+  if (
+    expectedRound !== roundToken
+  ) {
+
+    return;
+
+  }
+
 
   if (
     !isReelSpinning
@@ -1764,6 +1794,9 @@ function startGame() {
     null;
 
 
+  roundToken += 1;
+
+
   startScreen.hidden =
     true;
 
@@ -1796,6 +1829,15 @@ function startGame() {
 // ==============================
 
 function startRound() {
+
+  /*
+    A new round gets a new token.
+    Any callback belonging to an older
+    round is now invalid.
+  */
+
+  roundToken += 1;
+
 
   playerChoice = null;
 
@@ -1885,10 +1927,6 @@ function startRound() {
 
 function startNextRound() {
 
-  /*
-    Only surviving rounds can continue.
-  */
-
   if (
     !resultProcessed ||
     gameOver ||
@@ -1904,17 +1942,21 @@ function startNextRound() {
 
 
   /*
-    Hide any remaining result overlay.
+    Do not allow the player to skip
+    the visible result overlay.
   */
+
+  if (
+    resultOverlayVisible
+  ) {
+
+    return;
+
+  }
+
 
   hideResultOverlay();
 
-
-  /*
-    Immediately lock the current result
-    so repeated key presses cannot create
-    multiple rounds.
-  */
 
   resultProcessed =
     false;
@@ -1927,10 +1969,8 @@ function startNextRound() {
 
 
   /*
-    NO 3-SECOND WAIT.
-
-    The next round begins immediately
-    when ENTER or SPACE is pressed.
+    The next round starts immediately
+    after ENTER / SPACE is pressed.
   */
 
   startRound();
@@ -1953,7 +1993,8 @@ function selectPlayerChoice(choice) {
     playerChoice !== null ||
     isCountdownActive ||
     isReelSpinning ||
-    gameOver
+    gameOver ||
+    resultOverlayVisible
   ) {
 
     return;
@@ -2041,21 +2082,17 @@ function startCountdown() {
 
   if (
     isCountdownActive ||
-    isReelSpinning
-  ) {
-
-    return;
-
-  }
-
-
-  if (
+    isReelSpinning ||
     systemChoice === null
   ) {
 
     return;
 
   }
+
+
+  const thisRound =
+    roundToken;
 
 
   isCountdownActive =
@@ -2082,6 +2119,25 @@ function startCountdown() {
 
   countdownInterval =
     setInterval(() => {
+
+      /*
+        Ignore an old countdown callback.
+      */
+
+      if (
+        thisRound !== roundToken
+      ) {
+
+        clearInterval(
+          countdownInterval
+        );
+
+        countdownInterval = null;
+
+        return;
+
+      }
+
 
       countdownValue -= 1;
 
@@ -2112,11 +2168,20 @@ function startCountdown() {
         false;
 
 
+      /*
+        At 3 seconds the reel should already
+        have completed at 2.65 seconds.
+
+        If it has not, finish it safely.
+      */
+
       if (
         isReelSpinning
       ) {
 
-        finishSlotReelAnimation();
+        finishSlotReelAnimation(
+          thisRound
+        );
 
       }
 
@@ -2126,7 +2191,9 @@ function startCountdown() {
       );
 
 
-      revealResult();
+      revealResult(
+        thisRound
+      );
 
     }, 1000);
 
@@ -2137,10 +2204,12 @@ function startCountdown() {
 // REVEAL RESULT
 // ==============================
 
-function revealResult() {
+function revealResult(
+  expectedRound = roundToken
+) {
 
   if (
-    systemChoice === null
+    expectedRound !== roundToken
   ) {
 
     return;
@@ -2148,7 +2217,31 @@ function revealResult() {
   }
 
 
-  finishSlotReelAnimation();
+  if (
+    systemChoice === null ||
+    playerChoice === null ||
+    resultProcessed
+  ) {
+
+    return;
+
+  }
+
+
+  /*
+    Normally the reel has already finished.
+    This only safely finishes it if necessary.
+  */
+
+  if (
+    isReelSpinning
+  ) {
+
+    finishSlotReelAnimation(
+      expectedRound
+    );
+
+  }
 
 
   revealArea.hidden =
@@ -2163,7 +2256,9 @@ function revealResult() {
     `System chose: ${systemChoice}`;
 
 
-  calculateResult();
+  calculateResult(
+    expectedRound
+  );
 
 }
 
@@ -2172,7 +2267,18 @@ function revealResult() {
 // CALCULATE RESULT
 // ==============================
 
-function calculateResult() {
+function calculateResult(
+  expectedRound = roundToken
+) {
+
+  if (
+    expectedRound !== roundToken
+  ) {
+
+    return;
+
+  }
+
 
   if (
     resultProcessed
@@ -2182,6 +2288,22 @@ function calculateResult() {
 
   }
 
+
+  if (
+    playerChoice === null ||
+    systemChoice === null
+  ) {
+
+    return;
+
+  }
+
+
+  /*
+    Lock result processing immediately.
+    This prevents duplicate score changes,
+    duplicate overlays, and duplicate game-over.
+  */
 
   resultProcessed =
     true;
@@ -2246,17 +2368,30 @@ function calculateResult() {
 
 
     /*
-      ONLY GAME OVER waits.
+      Only the game-over path waits.
 
-      EYE CONTACT DETECTED stays
-      for 2 seconds, then Game Over
-      automatically appears.
+      EYE CONTACT DETECTED stays for 2 seconds,
+      then Game Over appears automatically.
     */
 
     showResultOverlay(
       "eye-contact",
       2000,
       () => {
+
+        /*
+          The callback is still associated with
+          this exact round.
+        */
+
+        if (
+          expectedRound !== roundToken
+        ) {
+
+          return;
+
+        }
+
 
         showGameOver();
 
@@ -2320,10 +2455,9 @@ function calculateResult() {
 
 
     /*
-      +1 POINT stays on screen briefly.
-
-      After it disappears, the player
-      can press ENTER immediately.
+      The overlay is visual only.
+      ENTER becomes usable immediately
+      AFTER this overlay disappears.
     */
 
     showResultOverlay(
@@ -2376,13 +2510,6 @@ function calculateResult() {
       `${getRandomRoast("safe")} — ${funnyMessage}`
     );
 
-
-    /*
-      SAFE stays on screen briefly.
-
-      After it disappears, the player
-      can press SPACE immediately.
-    */
 
     showResultOverlay(
       "safe",
@@ -2461,9 +2588,19 @@ function showGameOver() {
 
 
   /*
-    Make absolutely sure the overlay
-    is no longer blocking the screen.
+    Prevent the same game-over transition
+    from being processed twice.
   */
+
+  if (
+    !gameScreen.hidden &&
+    !gameOverScreen.hidden
+  ) {
+
+    return;
+
+  }
+
 
   hideResultOverlay();
 
@@ -2521,6 +2658,14 @@ function showGameOver() {
 
 function restartGame() {
 
+  /*
+    Invalidate every asynchronous callback
+    belonging to the previous game.
+  */
+
+  roundToken += 1;
+
+
   clearActiveTimers();
 
   stopAllAudio();
@@ -2548,9 +2693,6 @@ function restartGame() {
     null;
 
 
-  resetSlotReel();
-
-
   newHighScoreMessage.hidden =
     true;
 
@@ -2563,6 +2705,9 @@ function restartGame() {
 
   gameScreen.hidden =
     true;
+
+
+  resetSlotReel();
 
 
   updateHighScoreDisplay();
@@ -2722,11 +2867,14 @@ document.addEventListener(
       /*
         ENTER = next round after
         OPEN + CLOSED.
+
+        Overlay must already be gone.
       */
 
       if (
         resultProcessed &&
-        continueKey === "ENTER"
+        continueKey === "ENTER" &&
+        !resultOverlayVisible
       ) {
 
         event.preventDefault();
@@ -2820,11 +2968,14 @@ document.addEventListener(
       /*
         SPACE = next round after
         either CLOSED result.
+
+        Overlay must already be gone.
       */
 
       if (
         resultProcessed &&
-        continueKey === "SPACE"
+        continueKey === "SPACE" &&
+        !resultOverlayVisible
       ) {
 
         startNextRound();
@@ -2863,6 +3014,8 @@ document.addEventListener(
 
       /*
         SHIFT remains unchanged.
+        There is no defined game-ending
+        behavior for it in the current UI.
       */
 
       return;
