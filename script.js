@@ -1,7 +1,8 @@
 // Eye Roulette 👀
-// PLAYER CHOICE STAGE ONLY
+// PLAYER CHOICE + RANDOM SYSTEM CHOICE
 
 let playerChoice = null;
+let systemChoice = null;
 
 // Get elements
 const startScreen = document.getElementById("start-screen");
@@ -14,9 +15,11 @@ const closedButton = document.getElementById("choice-closed");
 const statusMessage = document.getElementById("status-message");
 const systemEyeState = document.getElementById("system-eye-state");
 
-// Start game
+// Start game / round
 function startGame() {
+  // Reset both choices for a new round
   playerChoice = null;
+  systemChoice = null;
 
   startScreen.hidden = true;
   gameScreen.hidden = false;
@@ -27,7 +30,7 @@ function startGame() {
   openButton.classList.remove("selected");
   closedButton.classList.remove("selected");
 
-  // Keep system state hidden
+  // Keep the system state hidden
   systemEyeState.textContent = "???";
 
   statusMessage.textContent = "Choose your claim: OPEN 👀 or CLOSED 😑";
@@ -36,7 +39,7 @@ function startGame() {
 // Player chooses OPEN or CLOSED
 function selectPlayerChoice(choice) {
 
-  // Don't allow another choice after one is made
+  // Don't allow another player choice after one is made
   if (playerChoice !== null) {
     return;
   }
@@ -44,7 +47,7 @@ function selectPlayerChoice(choice) {
   // Save the player's choice
   playerChoice = choice;
 
-  // Remove previous selection
+  // Visually mark the selected button
   openButton.classList.remove("selected");
   closedButton.classList.remove("selected");
 
@@ -62,14 +65,18 @@ function selectPlayerChoice(choice) {
   openButton.disabled = true;
   closedButton.disabled = true;
 
+  // Generate the system choice exactly once
+  if (systemChoice === null) {
+    systemChoice = Math.random() < 0.5 ? "OPEN" : "CLOSED";
+  }
+
   console.log("Player choice:", playerChoice);
+  console.log("System choice:", systemChoice);
 
   // IMPORTANT:
-  // Nothing else happens yet.
-  // No reveal.
-  // No score.
-  // No computer state.
-  // No next round.
+  // The system choice is stored internally only.
+  // Do not reveal it on the screen.
+  // No scoring, result, countdown, or game-over logic yet.
 }
 
 // Button controls
@@ -90,12 +97,11 @@ document.addEventListener("keydown", function (event) {
   if (event.key === "Enter") {
     event.preventDefault();
 
-    // If game hasn't started, ENTER starts it.
+    // If game hasn't started, ENTER starts it
     if (gameScreen.hidden) {
       startGame();
-    }
-    // Otherwise ENTER chooses OPEN.
-    else {
+    } else {
+      // During the game, ENTER chooses OPEN
       selectPlayerChoice("OPEN");
     }
 
@@ -106,7 +112,7 @@ document.addEventListener("keydown", function (event) {
   if (event.code === "Space") {
     event.preventDefault();
 
-    // SPACE chooses CLOSED during the game.
+    // During the game, SPACE chooses CLOSED
     if (!gameScreen.hidden) {
       selectPlayerChoice("CLOSED");
     }
@@ -114,5 +120,5 @@ document.addEventListener("keydown", function (event) {
     return;
   }
 
-  // Any other key does nothing.
+  // Any other key does nothing
 });
