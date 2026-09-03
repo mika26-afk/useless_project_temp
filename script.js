@@ -96,12 +96,222 @@ const messages = {
 };
 
 
+// ==============================
+// RETRO ROAST SYSTEM
+// ==============================
+
+const roastLines = {
+
+  open: [
+    "🤨 THAT WAS SUSPICIOUSLY CONFIDENT.",
+    "OH, YOU'RE FEELING BRAVE.",
+    "THAT ANSWER WAS WAY TOO FAST.",
+    "YOUR HONOR, THEY CLICKED IT.",
+    "CONFIDENCE: 100%.",
+    "EVIDENCE: 0%.",
+    "VERY INTERESTING.",
+    "YOU REALLY WENT WITH THAT?",
+    "THAT WAS BOLD.",
+    "STRATEGY OR BUTTON MASHING?"
+  ],
+
+  closed: [
+    "PLAYING IT SAFE, HUH?",
+    "STRATEGIC BLINDNESS.",
+    "COWARDICE OR GENIUS?",
+    "NO EYE CONTACT. NO PROBLEMS.",
+    "SAFE. BORING. EFFECTIVE.",
+    "YOU SAW ABSOLUTELY NOTHING.",
+    "THE EYES CAN'T JUDGE WHAT YOU DON'T SEE.",
+    "A VERY CONVENIENT ANSWER.",
+    "BRAVERY HAS LEFT THE CHAT.",
+    "YOU CHOSE PEACE."
+  ],
+
+  spin: [
+    "🎰 LET'S SEE IF YOU'RE TELLING THE TRUTH...",
+    "THE MACHINE HAS QUESTIONS.",
+    "THE CASINO DOES NOT TRUST YOU.",
+    "THE ALGORITHM IS CONFUSED.",
+    "THE MACHINE IS CONCERNED.",
+    "SUSPICION LEVEL: 📈",
+    "NO CAMERA. NO PROOF. JUST VIBES.",
+    "THE HONOR SYSTEM IS HAVING A BAD DAY.",
+    "ABSOLUTELY ZERO SCIENTIFIC EVIDENCE.",
+    "THE EYES HAVE QUESTIONS."
+  ],
+
+  reveal: [
+    "THE MOMENT OF TRUTH.",
+    "NO TAKE-BACKS.",
+    "FINAL ANSWER LOCKED.",
+    "WE INVESTIGATED.",
+    "THE MACHINE REMEMBERS NOTHING.",
+    "HERE COMES THE VERDICT.",
+    "YOUR SECRET IS SAFE WITH OUR NONEXISTENT CAMERA.",
+    "INTERESTING CHOICE...",
+    "WE'RE ABOUT TO FIND OUT.",
+    "THE REEL HAS SPOKEN."
+  ],
+
+  survive: [
+    "YOU GOT AWAY WITH IT.",
+    "THE SYSTEM BLINKED FIRST.",
+    "CASE CLOSED.",
+    "WE FOUND NOTHING.",
+    "YOU'RE GETTING AWAY WITH THIS.",
+    "LUCK: SUSPICIOUSLY HIGH.",
+    "THE MACHINE LOOKS CONFUSED.",
+    "WE'RE NOT SAYING YOU'RE LYING...",
+    "...BUT WE'RE ALSO NOT SAYING YOU'RE NOT.",
+    "HONESTY HAS LEFT THE CHAT."
+  ],
+
+  point: [
+    "CHEEKY. +1.",
+    "THAT WAS EITHER GENIUS OR LUCK.",
+    "ONE POINT FOR ABSURD CONFIDENCE.",
+    "YOU ACTUALLY GOT AWAY WITH IT.",
+    "THE EYES LOST THIS ROUND.",
+    "+1. THE AUDACITY.",
+    "POINT ACQUIRED. SUSPICION REMAINS.",
+    "THAT SHOULD NOT HAVE WORKED.",
+    "LUCKY LITTLE MENACE. +1.",
+    "THE MACHINE IS NOT HAPPY ABOUT THAT."
+  ],
+
+  safe: [
+    "SAFE. BORING. EFFECTIVE.",
+    "ZERO POINTS. ZERO EYE CONTACT.",
+    "TECHNICALLY, THAT COUNTS.",
+    "WE SAW NOTHING. PROBABLY.",
+    "A STRATEGIC NON-EVENT.",
+    "YOU SURVIVED. CONGRATULATIONS.",
+    "NO POINTS. NO PROBLEMS.",
+    "THE HONOR SYSTEM APPROVES. SORT OF.",
+    "THAT WAS VERY RESPONSIBLE OF YOU.",
+    "NOTHING TO SEE HERE."
+  ]
+
+};
+
+
+let lastRoastIndex = -1;
+
+
 function getRandomMessage(messageList) {
 
   const randomIndex =
     Math.floor(Math.random() * messageList.length);
 
   return messageList[randomIndex];
+
+}
+
+
+function getRandomRoast(category) {
+
+  const roastList =
+    roastLines[category];
+
+
+  if (
+    !roastList ||
+    roastList.length === 0
+  ) {
+
+    return "";
+
+  }
+
+
+  if (roastList.length === 1) {
+
+    lastRoastIndex = 0;
+
+    return roastList[0];
+
+  }
+
+
+  let randomIndex =
+    Math.floor(
+      Math.random() * roastList.length
+    );
+
+
+  /*
+    Avoid immediately repeating the
+    previous roast.
+  */
+
+  while (
+    randomIndex === lastRoastIndex
+  ) {
+
+    randomIndex =
+      Math.floor(
+        Math.random() * roastList.length
+      );
+
+  }
+
+
+  lastRoastIndex =
+    randomIndex;
+
+
+  return roastList[randomIndex];
+
+}
+
+
+function showRoast(message) {
+
+  if (!message) {
+
+    return;
+
+  }
+
+
+  statusMessage.textContent =
+    message;
+
+
+  /*
+    Restart the CSS animation so every
+    new roast gets a small arcade pop.
+  */
+
+  statusMessage.classList.remove(
+    "roast-pop"
+  );
+
+
+  void statusMessage.offsetWidth;
+
+
+  statusMessage.classList.add(
+    "roast-pop"
+  );
+
+}
+
+
+function pulseScoreDisplay() {
+
+  currentScoreDisplay.classList.remove(
+    "score-pulse"
+  );
+
+
+  void currentScoreDisplay.offsetWidth;
+
+
+  currentScoreDisplay.classList.add(
+    "score-pulse"
+  );
 
 }
 
@@ -116,8 +326,10 @@ const startScreen =
 const startButton =
   document.getElementById("start-button");
 
+
 const gameScreen =
   document.getElementById("game-screen");
+
 
 const roundNumberDisplay =
   document.getElementById("round-number");
@@ -128,11 +340,13 @@ const currentScoreDisplay =
 const highScoreDisplay =
   document.getElementById("high-score");
 
+
 const systemEyeVisual =
   document.getElementById("system-eye-visual");
 
 const systemEyeState =
   document.getElementById("system-eye-state");
+
 
 const systemSlotMachine =
   document.getElementById("system-slot-machine");
@@ -140,17 +354,20 @@ const systemSlotMachine =
 const slotStatus =
   document.getElementById("slot-status");
 
+
 const choiceOpenButton =
   document.getElementById("choice-open");
 
 const choiceClosedButton =
   document.getElementById("choice-closed");
 
+
 const countdownArea =
   document.getElementById("countdown-area");
 
 const countdownNumber =
   document.getElementById("countdown-number");
+
 
 const revealArea =
   document.getElementById("reveal-area");
@@ -167,6 +384,7 @@ const revealPointState =
 const revealCaughtState =
   document.getElementById("reveal-caught-state");
 
+
 const resultStates =
   document.getElementById("result-states");
 
@@ -182,8 +400,10 @@ const resultClosedSafe =
 const resultGameOver =
   document.getElementById("result-game-over");
 
+
 const statusMessage =
   document.getElementById("status-message");
+
 
 const gameOverScreen =
   document.getElementById("game-over-screen");
@@ -197,6 +417,7 @@ const gameOverMessage =
 const gameOverSubmessage =
   document.getElementById("game-over-submessage");
 
+
 const finalScoreValue =
   document.getElementById("final-score-value");
 
@@ -208,6 +429,7 @@ const finalHighScoreValue =
 
 const newHighScoreMessage =
   document.getElementById("new-high-score-message");
+
 
 const restartButton =
   document.getElementById("restart-button");
@@ -224,6 +446,7 @@ function loadHighScore() {
     const savedHighScore =
       localStorage.getItem(HIGH_SCORE_KEY);
 
+
     if (savedHighScore === null) {
 
       highScore = 0;
@@ -231,8 +454,10 @@ function loadHighScore() {
       return;
     }
 
+
     const parsedHighScore =
       Number(savedHighScore);
+
 
     if (
       Number.isFinite(parsedHighScore) &&
@@ -291,6 +516,7 @@ function checkForNewHighScore() {
   const previousHighScore =
     highScore;
 
+
   if (score > highScore) {
 
     highScore = score;
@@ -299,7 +525,9 @@ function checkForNewHighScore() {
 
   }
 
+
   updateHighScoreDisplay();
+
 
   return score > previousHighScore;
 
@@ -340,8 +568,10 @@ function prepareSlotReel() {
 
   `;
 
+
   systemEyeVisual.style.transition =
     "none";
+
 
   systemEyeVisual.style.transform =
     "translateY(0)";
@@ -355,17 +585,15 @@ function getTargetReelPosition() {
       ".slot-symbol"
     );
 
-  const slotWindow =
-    systemSlotMachine.querySelector(
-      ".slot-window"
-    );
 
   const targetEmoji =
     systemChoice === "OPEN"
       ? "👀"
       : "😑";
 
+
   let targetIndex = -1;
+
 
   /*
     Find the LAST matching symbol.
@@ -392,32 +620,44 @@ function getTargetReelPosition() {
 
   }
 
+
   if (targetIndex === -1) {
 
     targetIndex = 0;
 
   }
 
-  /*
-    Measure the actual rendered dimensions.
 
-    This keeps the final landing centered
-    even when the mobile CSS changes the
-    symbol/window height.
+  /*
+    Measure the actual rendered dimensions
+    instead of assuming 150px.
+
+    This preserves the exact landing position
+    on mobile where the CSS reel is 140px tall.
   */
 
+  const firstSymbol =
+    symbols[0];
+
   const symbolHeight =
-    symbols[0]
-      ? symbols[0].getBoundingClientRect().height
+    firstSymbol
+      ? firstSymbol.getBoundingClientRect().height
       : 150;
+
+
+  const slotWindow =
+    systemEyeVisual.parentElement;
+
 
   const windowHeight =
     slotWindow
       ? slotWindow.getBoundingClientRect().height
       : symbolHeight;
 
+
   const centerOffset =
     (windowHeight - symbolHeight) / 2;
+
 
   return (
     -(targetIndex * symbolHeight) +
@@ -443,7 +683,9 @@ function startSlotReelAnimation() {
 
   }
 
+
   isReelSpinning = true;
+
 
   systemSlotMachine.classList.remove(
     "revealed"
@@ -453,8 +695,15 @@ function startSlotReelAnimation() {
     "spinning"
   );
 
+
   slotStatus.textContent =
     "SPINNING...";
+
+
+  showRoast(
+    getRandomRoast("spin")
+  );
+
 
   /*
     Start from a known position.
@@ -462,26 +711,35 @@ function startSlotReelAnimation() {
 
   prepareSlotReel();
 
+
   /*
     Force browser reflow so the starting
-    position is applied before animation.
+    position is actually applied before
+    the animation begins.
   */
 
   void systemEyeVisual.offsetHeight;
 
+
   const finalPosition =
     getTargetReelPosition();
+
 
   /*
     Fast beginning → smooth deceleration
     → final settle.
+
+    This is the existing vertical reel
+    animation and remains unchanged.
   */
 
   systemEyeVisual.style.transition =
     "transform 2.65s cubic-bezier(0.12, 0.75, 0.18, 1)";
 
+
   systemEyeVisual.style.transform =
     `translateY(${finalPosition}px)`;
+
 
   reelAnimation =
     setTimeout(() => {
@@ -501,7 +759,9 @@ function finishSlotReelAnimation() {
 
   }
 
+
   isReelSpinning = false;
+
 
   if (reelAnimation !== null) {
 
@@ -511,16 +771,20 @@ function finishSlotReelAnimation() {
 
   }
 
+
   systemSlotMachine.classList.remove(
     "spinning"
   );
+
 
   systemSlotMachine.classList.add(
     "revealed"
   );
 
+
   slotStatus.textContent =
     "REVEAL";
+
 
   /*
     IMPORTANT:
@@ -533,6 +797,50 @@ function finishSlotReelAnimation() {
 
   systemEyeState.textContent =
     systemChoice;
+
+
+  /*
+    Briefly emphasize the symbol that
+    corresponds to the already-decided
+    systemChoice.
+  */
+
+  const symbols =
+    systemEyeVisual.querySelectorAll(
+      ".slot-symbol"
+    );
+
+
+  const targetEmoji =
+    systemChoice === "OPEN"
+      ? "👀"
+      : "😑";
+
+
+  symbols.forEach((symbol) => {
+
+    symbol.classList.remove(
+      "selected-result"
+    );
+
+  });
+
+
+  for (let i = symbols.length - 1; i >= 0; i--) {
+
+    if (
+      symbols[i].textContent === targetEmoji
+    ) {
+
+      symbols[i].classList.add(
+        "selected-result"
+      );
+
+      break;
+
+    }
+
+  }
 
 }
 
@@ -547,7 +855,9 @@ function resetSlotReel() {
 
   }
 
+
   isReelSpinning = false;
+
 
   systemSlotMachine.classList.remove(
     "spinning"
@@ -557,8 +867,10 @@ function resetSlotReel() {
     "revealed"
   );
 
+
   slotStatus.textContent =
     "READY";
+
 
   prepareSlotReel();
 
@@ -577,9 +889,11 @@ function startGame() {
 
   roundsSurvived = 0;
 
+
   playerChoice = null;
 
   systemChoice = null;
+
 
   countdownInterval = null;
 
@@ -591,15 +905,24 @@ function startGame() {
 
   continueKey = null;
 
+
   startScreen.hidden = true;
 
   gameScreen.hidden = false;
 
   gameOverScreen.hidden = true;
 
+
   newHighScoreMessage.hidden = true;
 
+
   updateHighScoreDisplay();
+
+
+  showRoast(
+    getRandomRoast("reveal")
+  );
+
 
   startRound();
 
@@ -616,22 +939,27 @@ function startRound() {
 
   systemChoice = null;
 
+
   isCountdownActive = false;
 
   resultProcessed = false;
 
   continueKey = null;
 
+
   systemEyeState.textContent =
     "???";
 
+
   resetSlotReel();
+
 
   countdownArea.hidden = true;
 
   revealArea.hidden = true;
 
   resultStates.hidden = true;
+
 
   resultSafe.hidden = true;
 
@@ -641,9 +969,11 @@ function startRound() {
 
   resultGameOver.hidden = true;
 
+
   choiceOpenButton.disabled = false;
 
   choiceClosedButton.disabled = false;
+
 
   choiceOpenButton.classList.remove(
     "selected"
@@ -653,14 +983,22 @@ function startRound() {
     "selected"
   );
 
+
   statusMessage.textContent =
     "";
+
+
+  statusMessage.classList.remove(
+    "roast-pop"
+  );
+
 
   roundNumberDisplay.textContent =
     roundNumber;
 
   currentScoreDisplay.textContent =
     score;
+
 
   updateHighScoreDisplay();
 
@@ -681,6 +1019,10 @@ function startNextRound() {
     roundNumber += 1;
 
     startRound();
+
+    showRoast(
+      getRandomRoast("reveal")
+    );
 
   }
 
@@ -709,7 +1051,9 @@ function selectPlayerChoice(choice) {
 
   }
 
+
   playerChoice = choice;
+
 
   if (choice === "OPEN") {
 
@@ -717,7 +1061,12 @@ function selectPlayerChoice(choice) {
       "selected"
     );
 
+    showRoast(
+      getRandomRoast("open")
+    );
+
   }
+
 
   if (choice === "CLOSED") {
 
@@ -725,11 +1074,17 @@ function selectPlayerChoice(choice) {
       "selected"
     );
 
+    showRoast(
+      getRandomRoast("closed")
+    );
+
   }
+
 
   choiceOpenButton.disabled = true;
 
   choiceClosedButton.disabled = true;
+
 
   /*
     IMPORTANT:
@@ -744,6 +1099,7 @@ function selectPlayerChoice(choice) {
     Math.random() < 0.5
       ? "OPEN"
       : "CLOSED";
+
 
   startCountdown();
 
@@ -765,18 +1121,27 @@ function startCountdown() {
 
   }
 
+
   if (systemChoice === null) {
 
     return;
 
   }
 
+
   isCountdownActive = true;
+
 
   countdownArea.hidden = false;
 
   countdownNumber.textContent =
     "3";
+
+
+  showRoast(
+    getRandomRoast("spin")
+  );
+
 
   /*
     Start the casino reel immediately.
@@ -784,42 +1149,35 @@ function startCountdown() {
 
   startSlotReelAnimation();
 
+
   let countdownValue = 3;
+
 
   countdownInterval =
     setInterval(() => {
 
       countdownValue -= 1;
 
+
       if (countdownValue > 0) {
 
         countdownNumber.textContent =
           countdownValue;
 
-        /*
-          Restart the countdown animation
-          when the number changes.
-        */
-
-        countdownNumber.style.animation =
-          "none";
-
-        void countdownNumber.offsetHeight;
-
-        countdownNumber.style.animation =
-          "";
-
         return;
 
       }
+
 
       clearInterval(countdownInterval);
 
       countdownInterval = null;
 
+
       countdownArea.hidden = true;
 
       isCountdownActive = false;
+
 
       /*
         The reel lasts 2.65 seconds,
@@ -835,6 +1193,12 @@ function startCountdown() {
         finishSlotReelAnimation();
 
       }
+
+
+      showRoast(
+        getRandomRoast("reveal")
+      );
+
 
       revealResult();
 
@@ -855,6 +1219,7 @@ function revealResult() {
 
   }
 
+
   /*
     Make absolutely sure the reel has
     finished before showing the result.
@@ -862,13 +1227,17 @@ function revealResult() {
 
   finishSlotReelAnimation();
 
+
   revealArea.hidden = false;
+
 
   systemEyeState.textContent =
     systemChoice;
 
+
   revealSystemState.textContent =
     `System chose: ${systemChoice}`;
+
 
   calculateResult();
 
@@ -887,9 +1256,12 @@ function calculateResult() {
 
   }
 
+
   resultProcessed = true;
 
+
   resultStates.hidden = false;
+
 
   const funnyMessage =
     getRandomMessage(
@@ -921,18 +1293,24 @@ function calculateResult() {
     revealSurvivalState.textContent =
       "You were caught making eye contact.";
 
+
     revealPointState.textContent =
       "Points this round: +0";
+
 
     revealCaughtState.textContent =
       "GAME OVER";
 
+
     resultGameOver.hidden =
       false;
 
+
     gameOver = true;
 
+
     showGameOver();
+
 
     return;
 
@@ -952,26 +1330,38 @@ function calculateResult() {
 
     roundsSurvived += 1;
 
+
     revealSurvivalState.textContent =
       "They blinked first. You survived.";
+
 
     revealPointState.textContent =
       "Points this round: +1";
 
+
     revealCaughtState.textContent =
       "";
+
 
     resultPoint.hidden =
       false;
 
+
     currentScoreDisplay.textContent =
       score;
+
+
+    pulseScoreDisplay();
+
 
     continueKey =
       "ENTER";
 
-    statusMessage.textContent =
-      `😑 THEY BLINKED! You survived. +1 POINT — ${funnyMessage} — Press ENTER`;
+
+    showRoast(
+      `${getRandomRoast("point")} — ${funnyMessage}`
+    );
+
 
     return;
 
@@ -989,23 +1379,31 @@ function calculateResult() {
 
     roundsSurvived += 1;
 
+
     revealSurvivalState.textContent =
       "You survived by keeping your eyes closed.";
+
 
     revealPointState.textContent =
       "Points this round: +0";
 
+
     revealCaughtState.textContent =
       "";
+
 
     resultClosedSafe.hidden =
       false;
 
+
     continueKey =
       "SPACE";
 
-    statusMessage.textContent =
-      `👀 THEY WERE WATCHING. You survived. +0 POINTS — ${funnyMessage} — Press SPACE`;
+
+    showRoast(
+      `${getRandomRoast("safe")} — ${funnyMessage}`
+    );
+
 
     return;
 
@@ -1023,23 +1421,30 @@ function calculateResult() {
 
     roundsSurvived += 1;
 
+
     revealSurvivalState.textContent =
       "Nobody looked. You survived.";
+
 
     revealPointState.textContent =
       "Points this round: +0";
 
+
     revealCaughtState.textContent =
       "";
+
 
     resultClosedSafe.hidden =
       false;
 
+
     continueKey =
       "SPACE";
 
-    statusMessage.textContent =
-      `😑 BOTH HID. You survived. +0 POINTS — ${funnyMessage} — Press SPACE`;
+
+    showRoast(
+      `${getRandomRoast("safe")} — ${funnyMessage}`
+    );
 
   }
 
@@ -1055,34 +1460,43 @@ function showGameOver() {
   const isNewHighScore =
     checkForNewHighScore();
 
+
   gameScreen.hidden =
     true;
 
   gameOverScreen.hidden =
     false;
 
+
   gameOverHeading.textContent =
     "GAME OVER";
 
+
   gameOverMessage.textContent =
     "EYE CONTACT DETECTED";
+
 
   gameOverSubmessage.textContent =
     getRandomMessage(
       messages.gameOver
     );
 
+
   finalScoreValue.textContent =
     score;
+
 
   roundsSurvivedValue.textContent =
     roundsSurvived;
 
+
   finalHighScoreValue.textContent =
     highScore;
 
+
   newHighScoreMessage.hidden =
     !isNewHighScore;
+
 
   statusMessage.textContent =
     `GAME OVER. EYE CONTACT DETECTED. ${getRandomMessage(messages.gameOver)}`;
@@ -1104,6 +1518,7 @@ function restartGame() {
 
   }
 
+
   if (reelAnimation !== null) {
 
     clearTimeout(reelAnimation);
@@ -1112,15 +1527,18 @@ function restartGame() {
 
   }
 
+
   score = 0;
 
   roundNumber = 1;
 
   roundsSurvived = 0;
 
+
   playerChoice = null;
 
   systemChoice = null;
+
 
   isCountdownActive = false;
 
@@ -1132,10 +1550,13 @@ function restartGame() {
 
   continueKey = null;
 
+
   resetSlotReel();
+
 
   newHighScoreMessage.hidden =
     true;
+
 
   gameOverScreen.hidden =
     true;
@@ -1145,6 +1566,7 @@ function restartGame() {
 
   gameScreen.hidden =
     true;
+
 
   updateHighScoreDisplay();
 
@@ -1160,6 +1582,7 @@ startButton.addEventListener(
   startGame
 );
 
+
 choiceOpenButton.addEventListener(
   "click",
   () => {
@@ -1169,6 +1592,7 @@ choiceOpenButton.addEventListener(
   }
 );
 
+
 choiceClosedButton.addEventListener(
   "click",
   () => {
@@ -1177,6 +1601,7 @@ choiceClosedButton.addEventListener(
 
   }
 );
+
 
 restartButton.addEventListener(
   "click",
@@ -1210,6 +1635,7 @@ document.addEventListener(
 
       }
 
+
       /*
         Claim OPEN.
       */
@@ -1226,6 +1652,7 @@ document.addEventListener(
         return;
 
       }
+
 
       /*
         Continue after OPEN + CLOSED.
@@ -1255,6 +1682,7 @@ document.addEventListener(
 
       event.preventDefault();
 
+
       /*
         Claim CLOSED.
       */
@@ -1271,6 +1699,7 @@ document.addEventListener(
         return;
 
       }
+
 
       /*
         Continue after CLOSED result.
