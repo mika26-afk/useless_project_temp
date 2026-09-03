@@ -13,7 +13,10 @@
   <!-- ============================== -->
   <section id="start-screen" class="screen">
     <header>
-      <h1 id="game-title">EYE ROULETTE <span aria-hidden="true">👀</span></h1>
+      <h1 id="game-title">
+        EYE ROULETTE <span aria-hidden="true">👀</span>
+      </h1>
+
       <p id="tagline">
         A game of nerve, honesty, and questionable decision-making.
       </p>
@@ -30,7 +33,9 @@
         This game runs entirely on the honor system — there's no camera watching you.
       </p>
 
-      <button id="start-button" type="button">Start Game</button>
+      <button id="start-button" type="button">
+        Start Game
+      </button>
 
       <p id="start-instruction">
         Press <kbd>ENTER</kbd> to start
@@ -58,12 +63,9 @@
       </p>
     </header>
 
-
     <main>
 
-      <!-- ============================== -->
-      <!-- SYSTEM EYES -->
-      <!-- ============================== -->
+      <!-- System / computer eyes area -->
       <section id="system-area" aria-labelledby="system-label">
         <h2 id="system-label">System Eyes</h2>
 
@@ -73,9 +75,7 @@
       </section>
 
 
-      <!-- ============================== -->
-      <!-- PLAYER CHOICE -->
-      <!-- ============================== -->
+      <!-- Player choice area -->
       <section
         id="player-choice-area"
         aria-labelledby="player-choice-label"
@@ -100,9 +100,7 @@
       </section>
 
 
-      <!-- ============================== -->
-      <!-- COUNTDOWN -->
-      <!-- ============================== -->
+      <!-- Countdown -->
       <section
         id="countdown-area"
         aria-live="polite"
@@ -114,9 +112,7 @@
       </section>
 
 
-      <!-- ============================== -->
-      <!-- REVEAL / RESULT -->
-      <!-- ============================== -->
+      <!-- Reveal / result -->
       <section
         id="reveal-area"
         aria-live="polite"
@@ -131,9 +127,7 @@
       </section>
 
 
-      <!-- ============================== -->
-      <!-- RESULT STATES -->
-      <!-- ============================== -->
+      <!-- Result states -->
       <section id="result-states" hidden>
 
         <div
@@ -179,18 +173,14 @@
       </section>
 
 
-      <!-- ============================== -->
-      <!-- STATUS / MESSAGE -->
-      <!-- ============================== -->
+      <!-- Status / message area -->
       <p
         id="status-message"
         aria-live="polite"
       ></p>
 
 
-      <!-- ============================== -->
-      <!-- CONTROLS -->
-      <!-- ============================== -->
+      <!-- Controls -->
       <section
         id="game-controls"
         aria-labelledby="controls-label"
@@ -209,9 +199,7 @@
       </section>
 
 
-      <!-- ============================== -->
-      <!-- HONOR SYSTEM -->
-      <!-- ============================== -->
+      <!-- Honor System -->
       <aside
         id="honor-system-notice"
         class="honor-system"
@@ -274,7 +262,6 @@
 
     </header>
 
-
     <main>
 
       <div class="final-stats">
@@ -294,8 +281,16 @@
           <span id="final-high-score-value">0</span>
         </p>
 
-      </div>
+        <p
+          id="new-high-score-message"
+          class="new-high-score-message"
+          hidden
+          aria-live="polite"
+        >
+          🏆 NEW HIGH SCORE!
+        </p>
 
+      </div>
 
       <button
         id="restart-button"

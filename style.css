@@ -84,6 +84,7 @@ kbd {
   font-family: monospace;
 }
 
+
 /* ============================== */
 /* HONOR SYSTEM */
 /* ============================== */
@@ -112,4 +113,15 @@ kbd {
 .honor-system-support {
   font-size: 0.75rem;
   opacity: 0.8;
+}
+
+
+/* ============================== */
+/* NEW HIGH SCORE */
+/* ============================== */
+
+.new-high-score-message {
+  font-size: 1rem !important;
+  font-weight: bold;
+  margin: 8px 0 !important;
 }

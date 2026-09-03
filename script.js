@@ -1,11 +1,6 @@
-// ==========================================
-// EYE ROULETTE 👀
-// MILESTONE 9 — PERSONALITY & HUMOR
-// ==========================================
-
-// ==========================================
+// ==============================
 // GAME STATE
-// ==========================================
+// ==============================
 
 let playerChoice = null;
 let systemChoice = null;
@@ -22,14 +17,20 @@ let gameOver = false;
 let continueKey = null;
 
 
-// ==========================================
-// PERSONALITY MESSAGE POOLS
-// ==========================================
+// ==============================
+// HIGH SCORE
+// ==============================
+
+const HIGH_SCORE_KEY = "eyeRouletteHighScore";
+
+let highScore = 0;
+
+
+// ==============================
+// FUNNY MESSAGES
+// ==============================
 
 const messages = {
-
-  // OPEN + CLOSED
-  // Player gets +1 point
   riskySafe: [
     "+1. Bold move.",
     "Risky. Respect.",
@@ -43,8 +44,6 @@ const messages = {
     "Okay, that actually worked."
   ],
 
-  // CLOSED + OPEN
-  // Player survives with 0 points
   closedOpen: [
     "Cowardice detected. 0 points.",
     "You didn't look. Smart.",
@@ -58,8 +57,6 @@ const messages = {
     "That counts. We think."
   ],
 
-  // CLOSED + CLOSED
-  // Player survives with 0 points
   bothClosed: [
     "Nobody looked. Beautiful.",
     "Two cowards. Zero points.",
@@ -73,8 +70,6 @@ const messages = {
     "Both chose peace."
   ],
 
-  // OPEN + OPEN
-  // Game Over
   gameOver: [
     "EYE CONTACT DETECTED.",
     "THE EYES HAVE WON.",
@@ -91,26 +86,20 @@ const messages = {
 };
 
 
-// ==========================================
-// RANDOM MESSAGE HELPER
-// ==========================================
-
 function getRandomMessage(messageList) {
   const randomIndex = Math.floor(Math.random() * messageList.length);
   return messageList[randomIndex];
 }
 
 
-// ==========================================
+// ==============================
 // DOM ELEMENTS
-// ==========================================
+// ==============================
 
 const startScreen = document.getElementById("start-screen");
-const gameScreen = document.getElementById("game-screen");
-const gameOverScreen = document.getElementById("game-over-screen");
-
 const startButton = document.getElementById("start-button");
-const restartButton = document.getElementById("restart-button");
+
+const gameScreen = document.getElementById("game-screen");
 
 const roundNumberDisplay = document.getElementById("round-number");
 const currentScoreDisplay = document.getElementById("current-score");
@@ -127,7 +116,11 @@ const countdownNumber = document.getElementById("countdown-number");
 
 const revealArea = document.getElementById("reveal-area");
 const revealSystemState = document.getElementById("reveal-system-state");
+const revealSurvivalState = document.getElementById("reveal-survival-state");
+const revealPointState = document.getElementById("reveal-point-state");
+const revealCaughtState = document.getElementById("reveal-caught-state");
 
+const resultStates = document.getElementById("result-states");
 const resultSafe = document.getElementById("result-safe");
 const resultPoint = document.getElementById("result-point");
 const resultClosedSafe = document.getElementById("result-closed-safe");
@@ -135,6 +128,7 @@ const resultGameOver = document.getElementById("result-game-over");
 
 const statusMessage = document.getElementById("status-message");
 
+const gameOverScreen = document.getElementById("game-over-screen");
 const gameOverHeading = document.getElementById("game-over-heading");
 const gameOverMessage = document.getElementById("game-over-message");
 const gameOverSubmessage = document.getElementById("game-over-submessage");
@@ -142,41 +136,99 @@ const gameOverSubmessage = document.getElementById("game-over-submessage");
 const finalScoreValue = document.getElementById("final-score-value");
 const roundsSurvivedValue = document.getElementById("rounds-survived-value");
 const finalHighScoreValue = document.getElementById("final-high-score-value");
+const newHighScoreMessage = document.getElementById("new-high-score-message");
+
+const restartButton = document.getElementById("restart-button");
 
 
-// ==========================================
+// ==============================
+// HIGH SCORE FUNCTIONS
+// ==============================
+
+function loadHighScore() {
+  try {
+    const savedHighScore = localStorage.getItem(HIGH_SCORE_KEY);
+
+    if (savedHighScore === null) {
+      highScore = 0;
+      return;
+    }
+
+    const parsedHighScore = Number(savedHighScore);
+
+    if (Number.isFinite(parsedHighScore) && parsedHighScore >= 0) {
+      highScore = Math.floor(parsedHighScore);
+    } else {
+      highScore = 0;
+    }
+  } catch (error) {
+    highScore = 0;
+  }
+}
+
+
+function saveHighScore() {
+  try {
+    localStorage.setItem(HIGH_SCORE_KEY, String(highScore));
+  } catch (error) {
+    // The game should continue even if localStorage is unavailable.
+  }
+}
+
+
+function updateHighScoreDisplay() {
+  highScoreDisplay.textContent = highScore;
+  finalHighScoreValue.textContent = highScore;
+}
+
+
+function checkForNewHighScore() {
+  const previousHighScore = highScore;
+
+  if (score > highScore) {
+    highScore = score;
+    saveHighScore();
+  }
+
+  updateHighScoreDisplay();
+
+  return score > previousHighScore;
+}
+
+
+// ==============================
 // START GAME
-// ==========================================
+// ==============================
 
 function startGame() {
-  playerChoice = null;
-  systemChoice = null;
-
   score = 0;
   roundNumber = 1;
   roundsSurvived = 0;
+
+  playerChoice = null;
+  systemChoice = null;
 
   countdownInterval = null;
   isCountdownActive = false;
   resultProcessed = false;
   gameOver = false;
-
   continueKey = null;
 
-  startScreen.style.display = "none";
-  gameOverScreen.style.display = "none";
-  gameScreen.style.display = "block";
+  startScreen.hidden = true;
+  gameScreen.hidden = false;
+  gameOverScreen.hidden = true;
 
-  currentScoreDisplay.textContent = score;
-  roundNumberDisplay.textContent = roundNumber;
+  newHighScoreMessage.hidden = true;
+
+  updateHighScoreDisplay();
 
   startRound();
 }
 
 
-// ==========================================
+// ==============================
 // START ROUND
-// ==========================================
+// ==============================
 
 function startRound() {
   playerChoice = null;
@@ -186,70 +238,53 @@ function startRound() {
   resultProcessed = false;
   continueKey = null;
 
+  systemEyeState.textContent = "???";
+
+  countdownArea.hidden = true;
+  revealArea.hidden = true;
+  resultStates.hidden = true;
+
+  resultSafe.hidden = true;
+  resultPoint.hidden = true;
+  resultClosedSafe.hidden = true;
+  resultGameOver.hidden = true;
+
   choiceOpenButton.disabled = false;
   choiceClosedButton.disabled = false;
 
   choiceOpenButton.classList.remove("selected");
   choiceClosedButton.classList.remove("selected");
 
-  countdownArea.style.display = "none";
-  revealArea.style.display = "none";
-
-  resultSafe.style.display = "none";
-  resultPoint.style.display = "none";
-  resultClosedSafe.style.display = "none";
-  resultGameOver.style.display = "none";
-
-  systemEyeVisual.textContent = "👁️";
-  systemEyeState.textContent = "???";
-
-  statusMessage.textContent = "Choose your eyes.";
+  statusMessage.textContent = "";
 
   roundNumberDisplay.textContent = roundNumber;
   currentScoreDisplay.textContent = score;
+  updateHighScoreDisplay();
 }
 
 
-// ==========================================
+// ==============================
 // START NEXT ROUND
-// ==========================================
+// ==============================
 
 function startNextRound() {
-  if (resultProcessed === false) {
-    return;
+  if (resultProcessed && !gameOver) {
+    roundNumber += 1;
+    startRound();
   }
-
-  if (gameOver === true) {
-    return;
-  }
-
-  roundNumber++;
-
-  startRound();
 }
 
 
-// ==========================================
+// ==============================
 // PLAYER CHOICE
-// ==========================================
+// ==============================
 
 function selectPlayerChoice(choice) {
-  if (gameOver === true) {
-    return;
-  }
-
-  if (isCountdownActive === true) {
-    return;
-  }
-
-  if (playerChoice !== null) {
+  if (playerChoice !== null || isCountdownActive || gameOver) {
     return;
   }
 
   playerChoice = choice;
-
-  choiceOpenButton.disabled = true;
-  choiceClosedButton.disabled = true;
 
   if (choice === "OPEN") {
     choiceOpenButton.classList.add("selected");
@@ -259,46 +294,43 @@ function selectPlayerChoice(choice) {
     choiceClosedButton.classList.add("selected");
   }
 
-  // System chooses exactly once.
+  choiceOpenButton.disabled = true;
+  choiceClosedButton.disabled = true;
+
   systemChoice = Math.random() < 0.5 ? "OPEN" : "CLOSED";
-
-  systemEyeState.textContent = "???";
-
-  statusMessage.textContent = "Choice locked. Get ready...";
 
   startCountdown();
 }
 
 
-// ==========================================
+// ==============================
 // COUNTDOWN
-// ==========================================
+// ==============================
 
 function startCountdown() {
-  if (gameOver === true) {
+  if (isCountdownActive) {
     return;
   }
 
   isCountdownActive = true;
 
-  countdownArea.style.display = "block";
+  countdownArea.hidden = false;
+  countdownNumber.textContent = "3";
 
-  let count = 3;
-  countdownNumber.textContent = count;
+  let countdownValue = 3;
 
   countdownInterval = setInterval(() => {
-    count--;
+    countdownValue -= 1;
 
-    if (count > 0) {
-      countdownNumber.textContent = count;
+    if (countdownValue > 0) {
+      countdownNumber.textContent = countdownValue;
       return;
     }
 
     clearInterval(countdownInterval);
     countdownInterval = null;
 
-    countdownArea.style.display = "none";
-
+    countdownArea.hidden = true;
     isCountdownActive = false;
 
     revealResult();
@@ -306,56 +338,58 @@ function startCountdown() {
 }
 
 
-// ==========================================
+// ==============================
 // REVEAL RESULT
-// ==========================================
+// ==============================
 
 function revealResult() {
-  if (gameOver === true) {
-    return;
-  }
-
-  if (systemChoice === null) {
-    return;
-  }
-
-  revealArea.style.display = "block";
-
-  revealSystemState.textContent = systemChoice;
+  revealArea.hidden = false;
 
   systemEyeState.textContent = systemChoice;
+
+  revealSystemState.textContent =
+    `System chose: ${systemChoice}`;
 
   calculateResult();
 }
 
 
-// ==========================================
+// ==============================
 // CALCULATE RESULT
-// ==========================================
+// ==============================
 
 function calculateResult() {
-  if (resultProcessed === true) {
-    return;
-  }
-
-  if (gameOver === true) {
+  if (resultProcessed) {
     return;
   }
 
   resultProcessed = true;
 
-  // ------------------------------------------
+  resultStates.hidden = false;
+
+  const funnyMessage = getRandomMessage(
+    playerChoice === "OPEN" && systemChoice === "CLOSED"
+      ? messages.riskySafe
+      : playerChoice === "CLOSED" && systemChoice === "OPEN"
+        ? messages.closedOpen
+        : messages.bothClosed
+  );
+
+
   // OPEN + OPEN = GAME OVER
-  // ------------------------------------------
-
   if (playerChoice === "OPEN" && systemChoice === "OPEN") {
+    revealSurvivalState.textContent =
+      "You were caught making eye contact.";
 
-    resultGameOver.style.display = "block";
+    revealPointState.textContent =
+      "Points this round: +0";
 
-    const funnyMessage = getRandomMessage(messages.gameOver);
+    revealCaughtState.textContent =
+      "GAME OVER";
 
-    statusMessage.textContent =
-      "GAME OVER. EYE CONTACT DETECTED. " + funnyMessage;
+    resultGameOver.hidden = false;
+
+    gameOver = true;
 
     showGameOver();
 
@@ -363,131 +397,146 @@ function calculateResult() {
   }
 
 
-  // ------------------------------------------
   // OPEN + CLOSED = SURVIVE +1
-  // ------------------------------------------
-
   if (playerChoice === "OPEN" && systemChoice === "CLOSED") {
+    score += 1;
+    roundsSurvived += 1;
 
-    score++;
-    roundsSurvived++;
+    revealSurvivalState.textContent =
+      "They blinked first. You survived.";
+
+    revealPointState.textContent =
+      "Points this round: +1";
+
+    revealCaughtState.textContent =
+      "";
+
+    resultPoint.hidden = false;
 
     currentScoreDisplay.textContent = score;
 
-    resultPoint.style.display = "block";
-
     continueKey = "ENTER";
 
-    const funnyMessage = getRandomMessage(messages.riskySafe);
-
     statusMessage.textContent =
-      "😑 THEY BLINKED! You survived. +1 POINT — " +
-      funnyMessage +
-      " — Press ENTER";
+      `😑 THEY BLINKED! You survived. +1 POINT — ${funnyMessage} — Press ENTER`;
 
     return;
   }
 
 
-  // ------------------------------------------
   // CLOSED + OPEN = SURVIVE +0
-  // ------------------------------------------
-
   if (playerChoice === "CLOSED" && systemChoice === "OPEN") {
+    roundsSurvived += 1;
 
-    roundsSurvived++;
+    revealSurvivalState.textContent =
+      "You survived by keeping your eyes closed.";
 
-    resultSafe.style.display = "block";
+    revealPointState.textContent =
+      "Points this round: +0";
+
+    revealCaughtState.textContent =
+      "";
+
+    resultClosedSafe.hidden = false;
 
     continueKey = "SPACE";
 
-    const funnyMessage = getRandomMessage(messages.closedOpen);
-
     statusMessage.textContent =
-      "👀 THEY WERE WATCHING. You survived. +0 POINTS — " +
-      funnyMessage +
-      " — Press SPACE";
+      `👀 THEY WERE WATCHING. You survived. +0 POINTS — ${funnyMessage} — Press SPACE`;
 
     return;
   }
 
 
-  // ------------------------------------------
   // CLOSED + CLOSED = SURVIVE +0
-  // ------------------------------------------
-
   if (playerChoice === "CLOSED" && systemChoice === "CLOSED") {
+    roundsSurvived += 1;
 
-    roundsSurvived++;
+    revealSurvivalState.textContent =
+      "Nobody looked. You survived.";
 
-    resultClosedSafe.style.display = "block";
+    revealPointState.textContent =
+      "Points this round: +0";
+
+    revealCaughtState.textContent =
+      "";
+
+    resultClosedSafe.hidden = false;
 
     continueKey = "SPACE";
 
-    const funnyMessage = getRandomMessage(messages.bothClosed);
-
     statusMessage.textContent =
-      "😑 BOTH HID. You survived. +0 POINTS — " +
-      funnyMessage +
-      " — Press SPACE";
+      `😑 BOTH HID. You survived. +0 POINTS — ${funnyMessage} — Press SPACE`;
 
     return;
   }
 }
 
 
-// ==========================================
+// ==============================
 // GAME OVER
-// ==========================================
+// ==============================
 
 function showGameOver() {
-  gameOver = true;
+  const isNewHighScore = checkForNewHighScore();
 
+  gameScreen.hidden = true;
+  gameOverScreen.hidden = false;
+
+  gameOverHeading.textContent = "GAME OVER";
+  gameOverMessage.textContent = "EYE CONTACT DETECTED";
+
+  gameOverSubmessage.textContent =
+    getRandomMessage(messages.gameOver);
+
+  finalScoreValue.textContent = score;
+  roundsSurvivedValue.textContent = roundsSurvived;
+  finalHighScoreValue.textContent = highScore;
+
+  newHighScoreMessage.hidden = !isNewHighScore;
+
+  statusMessage.textContent =
+    `GAME OVER. EYE CONTACT DETECTED. ${getRandomMessage(messages.gameOver)}`;
+}
+
+
+// ==============================
+// RESTART GAME
+// ==============================
+
+function restartGame() {
   if (countdownInterval !== null) {
     clearInterval(countdownInterval);
     countdownInterval = null;
   }
 
+  score = 0;
+  roundNumber = 1;
+  roundsSurvived = 0;
+
+  playerChoice = null;
+  systemChoice = null;
+
   isCountdownActive = false;
+  resultProcessed = false;
+  gameOver = false;
+  continueKey = null;
 
-  choiceOpenButton.disabled = true;
-  choiceClosedButton.disabled = true;
+  newHighScoreMessage.hidden = true;
 
-  gameOverHeading.textContent = "GAME OVER";
+  gameOverScreen.hidden = true;
+  startScreen.hidden = false;
+  gameScreen.hidden = true;
 
-  gameOverMessage.textContent = "EYE CONTACT DETECTED";
-
-  const funnyMessage = getRandomMessage(messages.gameOver);
-
-  gameOverSubmessage.textContent = funnyMessage;
-
-  finalScoreValue.textContent = score;
-
-  roundsSurvivedValue.textContent = roundsSurvived;
-
-  finalHighScoreValue.textContent = highScoreDisplay.textContent;
-
-  gameScreen.style.display = "none";
-  gameOverScreen.style.display = "block";
+  updateHighScoreDisplay();
 }
 
 
-// ==========================================
-// RESTART
-// ==========================================
-
-function restartGame() {
-  startGame();
-}
-
-
-// ==========================================
-// BUTTON EVENTS
-// ==========================================
+// ==============================
+// BUTTON LISTENERS
+// ==============================
 
 startButton.addEventListener("click", startGame);
-
-restartButton.addEventListener("click", restartGame);
 
 choiceOpenButton.addEventListener("click", () => {
   selectPlayerChoice("OPEN");
@@ -497,40 +546,34 @@ choiceClosedButton.addEventListener("click", () => {
   selectPlayerChoice("CLOSED");
 });
 
+restartButton.addEventListener("click", restartGame);
 
-// ==========================================
+
+// ==============================
 // KEYBOARD CONTROLS
-// ==========================================
+// ==============================
 
 document.addEventListener("keydown", (event) => {
 
-  // ENTER = OPEN / CONTINUE
+  // ENTER
   if (event.key === "Enter") {
 
-    if (gameOver === true) {
-      return;
-    }
-
-    // Start screen
-    if (startScreen.style.display !== "none") {
+    if (!startScreen.hidden) {
       startGame();
       return;
     }
 
-    // Choose OPEN
     if (
-      gameScreen.style.display !== "none" &&
-      playerChoice === null &&
-      isCountdownActive === false
+      !gameOver &&
+      !isCountdownActive &&
+      playerChoice === null
     ) {
       selectPlayerChoice("OPEN");
       return;
     }
 
-    // Continue after OPEN + CLOSED
     if (
-      gameScreen.style.display !== "none" &&
-      resultProcessed === true &&
+      !gameOver &&
       continueKey === "ENTER"
     ) {
       startNextRound();
@@ -539,29 +582,21 @@ document.addEventListener("keydown", (event) => {
   }
 
 
-  // SPACE = CLOSED / CONTINUE
+  // SPACE
   if (event.code === "Space") {
-
-    if (gameOver === true) {
-      return;
-    }
-
     event.preventDefault();
 
-    // Choose CLOSED
     if (
-      gameScreen.style.display !== "none" &&
-      playerChoice === null &&
-      isCountdownActive === false
+      !gameOver &&
+      !isCountdownActive &&
+      playerChoice === null
     ) {
       selectPlayerChoice("CLOSED");
       return;
     }
 
-    // Continue after CLOSED results
     if (
-      gameScreen.style.display !== "none" &&
-      resultProcessed === true &&
+      !gameOver &&
       continueKey === "SPACE"
     ) {
       startNextRound();
@@ -570,7 +605,7 @@ document.addEventListener("keydown", (event) => {
   }
 
 
-  // R = RESTART
+  // R
   if (event.key.toLowerCase() === "r") {
     restartGame();
     return;
@@ -578,8 +613,16 @@ document.addEventListener("keydown", (event) => {
 
 
   // SHIFT
-  // Existing SHIFT behavior remains unchanged.
   if (event.key === "Shift") {
+    // Existing SHIFT behavior remains unchanged.
     return;
   }
 });
+
+
+// ==============================
+// INITIALIZE
+// ==============================
+
+loadHighScore();
+updateHighScoreDisplay();
