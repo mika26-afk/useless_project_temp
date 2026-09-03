@@ -116,10 +116,8 @@ const startScreen =
 const startButton =
   document.getElementById("start-button");
 
-
 const gameScreen =
   document.getElementById("game-screen");
-
 
 const roundNumberDisplay =
   document.getElementById("round-number");
@@ -130,13 +128,11 @@ const currentScoreDisplay =
 const highScoreDisplay =
   document.getElementById("high-score");
 
-
 const systemEyeVisual =
   document.getElementById("system-eye-visual");
 
 const systemEyeState =
   document.getElementById("system-eye-state");
-
 
 const systemSlotMachine =
   document.getElementById("system-slot-machine");
@@ -144,20 +140,17 @@ const systemSlotMachine =
 const slotStatus =
   document.getElementById("slot-status");
 
-
 const choiceOpenButton =
   document.getElementById("choice-open");
 
 const choiceClosedButton =
   document.getElementById("choice-closed");
 
-
 const countdownArea =
   document.getElementById("countdown-area");
 
 const countdownNumber =
   document.getElementById("countdown-number");
-
 
 const revealArea =
   document.getElementById("reveal-area");
@@ -174,7 +167,6 @@ const revealPointState =
 const revealCaughtState =
   document.getElementById("reveal-caught-state");
 
-
 const resultStates =
   document.getElementById("result-states");
 
@@ -190,10 +182,8 @@ const resultClosedSafe =
 const resultGameOver =
   document.getElementById("result-game-over");
 
-
 const statusMessage =
   document.getElementById("status-message");
-
 
 const gameOverScreen =
   document.getElementById("game-over-screen");
@@ -207,7 +197,6 @@ const gameOverMessage =
 const gameOverSubmessage =
   document.getElementById("game-over-submessage");
 
-
 const finalScoreValue =
   document.getElementById("final-score-value");
 
@@ -219,7 +208,6 @@ const finalHighScoreValue =
 
 const newHighScoreMessage =
   document.getElementById("new-high-score-message");
-
 
 const restartButton =
   document.getElementById("restart-button");
@@ -236,7 +224,6 @@ function loadHighScore() {
     const savedHighScore =
       localStorage.getItem(HIGH_SCORE_KEY);
 
-
     if (savedHighScore === null) {
 
       highScore = 0;
@@ -244,10 +231,8 @@ function loadHighScore() {
       return;
     }
 
-
     const parsedHighScore =
       Number(savedHighScore);
-
 
     if (
       Number.isFinite(parsedHighScore) &&
@@ -306,7 +291,6 @@ function checkForNewHighScore() {
   const previousHighScore =
     highScore;
 
-
   if (score > highScore) {
 
     highScore = score;
@@ -315,9 +299,7 @@ function checkForNewHighScore() {
 
   }
 
-
   updateHighScoreDisplay();
-
 
   return score > previousHighScore;
 
@@ -358,10 +340,8 @@ function prepareSlotReel() {
 
   `;
 
-
   systemEyeVisual.style.transition =
     "none";
-
 
   systemEyeVisual.style.transform =
     "translateY(0)";
@@ -375,15 +355,17 @@ function getTargetReelPosition() {
       ".slot-symbol"
     );
 
+  const slotWindow =
+    systemSlotMachine.querySelector(
+      ".slot-window"
+    );
 
   const targetEmoji =
     systemChoice === "OPEN"
       ? "👀"
       : "😑";
 
-
   let targetIndex = -1;
-
 
   /*
     Find the LAST matching symbol.
@@ -410,28 +392,32 @@ function getTargetReelPosition() {
 
   }
 
-
   if (targetIndex === -1) {
 
     targetIndex = 0;
 
   }
 
-
   /*
-    Each symbol is 150px tall.
-    The target symbol should finish
-    exactly inside the center of the window.
+    Measure the actual rendered dimensions.
+
+    This keeps the final landing centered
+    even when the mobile CSS changes the
+    symbol/window height.
   */
 
-  const symbolHeight = 150;
+  const symbolHeight =
+    symbols[0]
+      ? symbols[0].getBoundingClientRect().height
+      : 150;
 
-  const windowHeight = 150;
-
+  const windowHeight =
+    slotWindow
+      ? slotWindow.getBoundingClientRect().height
+      : symbolHeight;
 
   const centerOffset =
     (windowHeight - symbolHeight) / 2;
-
 
   return (
     -(targetIndex * symbolHeight) +
@@ -457,9 +443,7 @@ function startSlotReelAnimation() {
 
   }
 
-
   isReelSpinning = true;
-
 
   systemSlotMachine.classList.remove(
     "revealed"
@@ -469,10 +453,8 @@ function startSlotReelAnimation() {
     "spinning"
   );
 
-
   slotStatus.textContent =
     "SPINNING...";
-
 
   /*
     Start from a known position.
@@ -480,19 +462,15 @@ function startSlotReelAnimation() {
 
   prepareSlotReel();
 
-
   /*
     Force browser reflow so the starting
-    position is actually applied before
-    the animation begins.
+    position is applied before animation.
   */
 
   void systemEyeVisual.offsetHeight;
 
-
   const finalPosition =
     getTargetReelPosition();
-
 
   /*
     Fast beginning → smooth deceleration
@@ -502,10 +480,8 @@ function startSlotReelAnimation() {
   systemEyeVisual.style.transition =
     "transform 2.65s cubic-bezier(0.12, 0.75, 0.18, 1)";
 
-
   systemEyeVisual.style.transform =
     `translateY(${finalPosition}px)`;
-
 
   reelAnimation =
     setTimeout(() => {
@@ -525,9 +501,7 @@ function finishSlotReelAnimation() {
 
   }
 
-
   isReelSpinning = false;
-
 
   if (reelAnimation !== null) {
 
@@ -537,20 +511,16 @@ function finishSlotReelAnimation() {
 
   }
 
-
   systemSlotMachine.classList.remove(
     "spinning"
   );
-
 
   systemSlotMachine.classList.add(
     "revealed"
   );
 
-
   slotStatus.textContent =
     "REVEAL";
-
 
   /*
     IMPORTANT:
@@ -577,9 +547,7 @@ function resetSlotReel() {
 
   }
 
-
   isReelSpinning = false;
-
 
   systemSlotMachine.classList.remove(
     "spinning"
@@ -589,10 +557,8 @@ function resetSlotReel() {
     "revealed"
   );
 
-
   slotStatus.textContent =
     "READY";
-
 
   prepareSlotReel();
 
@@ -611,11 +577,9 @@ function startGame() {
 
   roundsSurvived = 0;
 
-
   playerChoice = null;
 
   systemChoice = null;
-
 
   countdownInterval = null;
 
@@ -627,19 +591,15 @@ function startGame() {
 
   continueKey = null;
 
-
   startScreen.hidden = true;
 
   gameScreen.hidden = false;
 
   gameOverScreen.hidden = true;
 
-
   newHighScoreMessage.hidden = true;
 
-
   updateHighScoreDisplay();
-
 
   startRound();
 
@@ -656,27 +616,22 @@ function startRound() {
 
   systemChoice = null;
 
-
   isCountdownActive = false;
 
   resultProcessed = false;
 
   continueKey = null;
 
-
   systemEyeState.textContent =
     "???";
 
-
   resetSlotReel();
-
 
   countdownArea.hidden = true;
 
   revealArea.hidden = true;
 
   resultStates.hidden = true;
-
 
   resultSafe.hidden = true;
 
@@ -686,11 +641,9 @@ function startRound() {
 
   resultGameOver.hidden = true;
 
-
   choiceOpenButton.disabled = false;
 
   choiceClosedButton.disabled = false;
-
 
   choiceOpenButton.classList.remove(
     "selected"
@@ -700,17 +653,14 @@ function startRound() {
     "selected"
   );
 
-
   statusMessage.textContent =
     "";
-
 
   roundNumberDisplay.textContent =
     roundNumber;
 
   currentScoreDisplay.textContent =
     score;
-
 
   updateHighScoreDisplay();
 
@@ -759,9 +709,7 @@ function selectPlayerChoice(choice) {
 
   }
 
-
   playerChoice = choice;
-
 
   if (choice === "OPEN") {
 
@@ -771,7 +719,6 @@ function selectPlayerChoice(choice) {
 
   }
 
-
   if (choice === "CLOSED") {
 
     choiceClosedButton.classList.add(
@@ -780,11 +727,9 @@ function selectPlayerChoice(choice) {
 
   }
 
-
   choiceOpenButton.disabled = true;
 
   choiceClosedButton.disabled = true;
-
 
   /*
     IMPORTANT:
@@ -799,7 +744,6 @@ function selectPlayerChoice(choice) {
     Math.random() < 0.5
       ? "OPEN"
       : "CLOSED";
-
 
   startCountdown();
 
@@ -821,22 +765,18 @@ function startCountdown() {
 
   }
 
-
   if (systemChoice === null) {
 
     return;
 
   }
 
-
   isCountdownActive = true;
-
 
   countdownArea.hidden = false;
 
   countdownNumber.textContent =
     "3";
-
 
   /*
     Start the casino reel immediately.
@@ -844,35 +784,42 @@ function startCountdown() {
 
   startSlotReelAnimation();
 
-
   let countdownValue = 3;
-
 
   countdownInterval =
     setInterval(() => {
 
       countdownValue -= 1;
 
-
       if (countdownValue > 0) {
 
         countdownNumber.textContent =
           countdownValue;
 
+        /*
+          Restart the countdown animation
+          when the number changes.
+        */
+
+        countdownNumber.style.animation =
+          "none";
+
+        void countdownNumber.offsetHeight;
+
+        countdownNumber.style.animation =
+          "";
+
         return;
 
       }
-
 
       clearInterval(countdownInterval);
 
       countdownInterval = null;
 
-
       countdownArea.hidden = true;
 
       isCountdownActive = false;
-
 
       /*
         The reel lasts 2.65 seconds,
@@ -888,7 +835,6 @@ function startCountdown() {
         finishSlotReelAnimation();
 
       }
-
 
       revealResult();
 
@@ -909,7 +855,6 @@ function revealResult() {
 
   }
 
-
   /*
     Make absolutely sure the reel has
     finished before showing the result.
@@ -917,17 +862,13 @@ function revealResult() {
 
   finishSlotReelAnimation();
 
-
   revealArea.hidden = false;
-
 
   systemEyeState.textContent =
     systemChoice;
 
-
   revealSystemState.textContent =
     `System chose: ${systemChoice}`;
-
 
   calculateResult();
 
@@ -946,12 +887,9 @@ function calculateResult() {
 
   }
 
-
   resultProcessed = true;
 
-
   resultStates.hidden = false;
-
 
   const funnyMessage =
     getRandomMessage(
@@ -983,24 +921,18 @@ function calculateResult() {
     revealSurvivalState.textContent =
       "You were caught making eye contact.";
 
-
     revealPointState.textContent =
       "Points this round: +0";
-
 
     revealCaughtState.textContent =
       "GAME OVER";
 
-
     resultGameOver.hidden =
       false;
 
-
     gameOver = true;
 
-
     showGameOver();
-
 
     return;
 
@@ -1020,34 +952,26 @@ function calculateResult() {
 
     roundsSurvived += 1;
 
-
     revealSurvivalState.textContent =
       "They blinked first. You survived.";
-
 
     revealPointState.textContent =
       "Points this round: +1";
 
-
     revealCaughtState.textContent =
       "";
-
 
     resultPoint.hidden =
       false;
 
-
     currentScoreDisplay.textContent =
       score;
-
 
     continueKey =
       "ENTER";
 
-
     statusMessage.textContent =
       `😑 THEY BLINKED! You survived. +1 POINT — ${funnyMessage} — Press ENTER`;
-
 
     return;
 
@@ -1065,30 +989,23 @@ function calculateResult() {
 
     roundsSurvived += 1;
 
-
     revealSurvivalState.textContent =
       "You survived by keeping your eyes closed.";
-
 
     revealPointState.textContent =
       "Points this round: +0";
 
-
     revealCaughtState.textContent =
       "";
-
 
     resultClosedSafe.hidden =
       false;
 
-
     continueKey =
       "SPACE";
 
-
     statusMessage.textContent =
       `👀 THEY WERE WATCHING. You survived. +0 POINTS — ${funnyMessage} — Press SPACE`;
-
 
     return;
 
@@ -1106,26 +1023,20 @@ function calculateResult() {
 
     roundsSurvived += 1;
 
-
     revealSurvivalState.textContent =
       "Nobody looked. You survived.";
-
 
     revealPointState.textContent =
       "Points this round: +0";
 
-
     revealCaughtState.textContent =
       "";
-
 
     resultClosedSafe.hidden =
       false;
 
-
     continueKey =
       "SPACE";
-
 
     statusMessage.textContent =
       `😑 BOTH HID. You survived. +0 POINTS — ${funnyMessage} — Press SPACE`;
@@ -1144,43 +1055,34 @@ function showGameOver() {
   const isNewHighScore =
     checkForNewHighScore();
 
-
   gameScreen.hidden =
     true;
 
   gameOverScreen.hidden =
     false;
 
-
   gameOverHeading.textContent =
     "GAME OVER";
 
-
   gameOverMessage.textContent =
     "EYE CONTACT DETECTED";
-
 
   gameOverSubmessage.textContent =
     getRandomMessage(
       messages.gameOver
     );
 
-
   finalScoreValue.textContent =
     score;
-
 
   roundsSurvivedValue.textContent =
     roundsSurvived;
 
-
   finalHighScoreValue.textContent =
     highScore;
 
-
   newHighScoreMessage.hidden =
     !isNewHighScore;
-
 
   statusMessage.textContent =
     `GAME OVER. EYE CONTACT DETECTED. ${getRandomMessage(messages.gameOver)}`;
@@ -1202,7 +1104,6 @@ function restartGame() {
 
   }
 
-
   if (reelAnimation !== null) {
 
     clearTimeout(reelAnimation);
@@ -1211,18 +1112,15 @@ function restartGame() {
 
   }
 
-
   score = 0;
 
   roundNumber = 1;
 
   roundsSurvived = 0;
 
-
   playerChoice = null;
 
   systemChoice = null;
-
 
   isCountdownActive = false;
 
@@ -1234,13 +1132,10 @@ function restartGame() {
 
   continueKey = null;
 
-
   resetSlotReel();
-
 
   newHighScoreMessage.hidden =
     true;
-
 
   gameOverScreen.hidden =
     true;
@@ -1250,7 +1145,6 @@ function restartGame() {
 
   gameScreen.hidden =
     true;
-
 
   updateHighScoreDisplay();
 
@@ -1266,7 +1160,6 @@ startButton.addEventListener(
   startGame
 );
 
-
 choiceOpenButton.addEventListener(
   "click",
   () => {
@@ -1276,7 +1169,6 @@ choiceOpenButton.addEventListener(
   }
 );
 
-
 choiceClosedButton.addEventListener(
   "click",
   () => {
@@ -1285,7 +1177,6 @@ choiceClosedButton.addEventListener(
 
   }
 );
-
 
 restartButton.addEventListener(
   "click",
@@ -1319,7 +1210,6 @@ document.addEventListener(
 
       }
 
-
       /*
         Claim OPEN.
       */
@@ -1336,7 +1226,6 @@ document.addEventListener(
         return;
 
       }
-
 
       /*
         Continue after OPEN + CLOSED.
@@ -1366,7 +1255,6 @@ document.addEventListener(
 
       event.preventDefault();
 
-
       /*
         Claim CLOSED.
       */
@@ -1383,7 +1271,6 @@ document.addEventListener(
         return;
 
       }
-
 
       /*
         Continue after CLOSED result.

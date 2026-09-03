@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08070d">
   <title>Eye Roulette 👀</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -15,7 +16,11 @@
 
   <section id="start-screen" class="screen">
 
-    <header>
+    <header class="start-header">
+      <div class="casino-lights" aria-hidden="true"></div>
+
+      <p class="eyebrow">◆ THE HONESTY CASINO ◆</p>
+
       <h1 id="game-title">
         EYE ROULETTE <span aria-hidden="true">👀</span>
       </h1>
@@ -27,23 +32,30 @@
 
     <main>
 
-      <p id="how-to-play">
-        Each round, claim whether your eyes are open or closed, then see if the
-        system catches you making eye contact. Survive as many rounds as you can
-        without getting caught.
-      </p>
+      <div class="start-panel">
 
-      <p id="honor-note-start" class="honor-note">
-        This game runs entirely on the honor system — there's no camera watching you.
-      </p>
+        <div class="panel-label">HOW TO PLAY</div>
 
-      <button id="start-button" type="button">
-        Start Game
-      </button>
+        <p id="how-to-play">
+          Each round, claim whether your eyes are open or closed, then see if the
+          system catches you making eye contact. Survive as many rounds as you can
+          without getting caught.
+        </p>
 
-      <p id="start-instruction">
-        Press <kbd>ENTER</kbd> to start
-      </p>
+        <p id="honor-note-start" class="honor-note">
+          This game runs entirely on the honor system — there's no camera watching you.
+        </p>
+
+        <button id="start-button" type="button">
+          <span class="button-icon" aria-hidden="true">▶</span>
+          START GAME
+        </button>
+
+        <p id="start-instruction">
+          Press <kbd>ENTER</kbd> to start
+        </p>
+
+      </div>
 
     </main>
 
@@ -58,17 +70,26 @@
 
     <header id="game-info">
 
-      <p id="round-counter">
-        Round: <span id="round-number">1</span>
-      </p>
+      <div class="hud-card">
+        <span class="hud-label">ROUND</span>
+        <strong id="round-counter">
+          <span id="round-number">1</span>
+        </strong>
+      </div>
 
-      <p id="score-display">
-        Score: <span id="current-score">0</span>
-      </p>
+      <div class="hud-card score-card">
+        <span class="hud-label">SCORE</span>
+        <strong id="score-display">
+          <span id="current-score">0</span>
+        </strong>
+      </div>
 
-      <p id="high-score-display">
-        High Score: <span id="high-score">0</span>
-      </p>
+      <div class="hud-card high-score-card">
+        <span class="hud-label">HIGH SCORE</span>
+        <strong id="high-score-display">
+          <span id="high-score">0</span>
+        </strong>
+      </div>
 
     </header>
 
@@ -82,8 +103,14 @@
       <section id="system-area" aria-labelledby="system-label">
 
         <h2 id="system-label">
-          System Eyes
+          <span aria-hidden="true">◆</span>
+          SYSTEM EYES
+          <span aria-hidden="true">◆</span>
         </h2>
+
+        <p class="section-subtitle">
+          THE REEL KNOWS. YOU DON'T.
+        </p>
 
 
         <!-- SLOT MACHINE -->
@@ -92,6 +119,12 @@
           id="system-slot-machine"
           aria-label="System eye slot machine"
         >
+
+          <div class="machine-top-light" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
 
           <div class="slot-machine-top">
             SYSTEM REEL
@@ -102,12 +135,15 @@
 
           <div class="slot-window">
 
-            <!-- Fixed center selection line -->
+            <!-- Fixed center selection indicator -->
 
             <div
-              class="slot-center-line"
+              class="slot-selection-indicators"
               aria-hidden="true"
-            ></div>
+            >
+              <span class="indicator-left">▶</span>
+              <span class="indicator-right">◀</span>
+            </div>
 
 
             <!-- Vertical reel -->
@@ -179,26 +215,36 @@
       >
 
         <h2 id="player-choice-label">
-          Your Claim
+          YOUR CLAIM
         </h2>
 
-
-        <button
-          id="choice-open"
-          class="choice-button"
-          type="button"
-        >
-          OPEN 👀
-        </button>
+        <p class="section-subtitle">
+          TELL THE TRUTH. OR DON'T.
+        </p>
 
 
-        <button
-          id="choice-closed"
-          class="choice-button"
-          type="button"
-        >
-          CLOSED 😑
-        </button>
+        <div class="choice-buttons">
+
+          <button
+            id="choice-open"
+            class="choice-button"
+            type="button"
+          >
+            <span class="choice-symbol" aria-hidden="true">👀</span>
+            <span>OPEN</span>
+          </button>
+
+
+          <button
+            id="choice-closed"
+            class="choice-button"
+            type="button"
+          >
+            <span class="choice-symbol" aria-hidden="true">😑</span>
+            <span>CLOSED</span>
+          </button>
+
+        </div>
 
       </section>
 
@@ -213,12 +259,16 @@
         hidden
       >
 
-        <h2 id="countdown-label">
-          Countdown
-        </h2>
+        <p id="countdown-label">
+          GET READY
+        </p>
 
         <p id="countdown-number">
           3
+        </p>
+
+        <p class="countdown-subtitle">
+          THE EYES ARE WATCHING
         </p>
 
       </section>
@@ -234,9 +284,11 @@
         hidden
       >
 
-        <h2 id="reveal-label">
-          Reveal
-        </h2>
+        <div class="reveal-heading">
+          <span aria-hidden="true">◆</span>
+          REVEAL
+          <span aria-hidden="true">◆</span>
+        </div>
 
         <p id="reveal-system-state"></p>
 
@@ -257,7 +309,7 @@
 
         <div
           id="result-safe"
-          class="result-container"
+          class="result-container result-neutral"
           hidden
         >
           <p>
@@ -268,7 +320,7 @@
 
         <div
           id="result-point"
-          class="result-container"
+          class="result-container result-success"
           hidden
         >
           <p>
@@ -279,7 +331,7 @@
 
         <div
           id="result-closed-safe"
-          class="result-container"
+          class="result-container result-safe"
           hidden
         >
           <p>
@@ -290,7 +342,7 @@
 
         <div
           id="result-game-over"
-          class="result-container"
+          class="result-container result-danger"
           hidden
         >
           <p>
@@ -321,17 +373,19 @@
       >
 
         <h2 id="controls-label">
-          Controls
+          CONTROLS
         </h2>
 
         <ul id="controls-list">
 
           <li>
-            <kbd>ENTER</kbd> — Claim eyes are OPEN
+            <kbd>ENTER</kbd>
+            <span>Claim OPEN</span>
           </li>
 
           <li>
-            <kbd>SPACE</kbd> — Claim eyes are CLOSED
+            <kbd>SPACE</kbd>
+            <span>Claim CLOSED</span>
           </li>
 
         </ul>
@@ -392,6 +446,10 @@
         💀
       </p>
 
+      <p class="game-over-kicker">
+        ◆ CASINO SESSION TERMINATED ◆
+      </p>
+
       <h1 id="game-over-heading">
         GAME OVER
       </h1>
@@ -415,22 +473,22 @@
 
       <div class="final-stats">
 
-        <p id="final-score">
-          SCORE:
-          <span id="final-score-value">0</span>
-        </p>
+        <div class="final-stat">
+          <span>SCORE</span>
+          <strong id="final-score-value">0</strong>
+        </div>
 
 
-        <p id="rounds-survived">
-          ROUNDS:
-          <span id="rounds-survived-value">0</span>
-        </p>
+        <div class="final-stat">
+          <span>ROUNDS</span>
+          <strong id="rounds-survived-value">0</strong>
+        </div>
 
 
-        <p id="final-high-score">
-          High Score:
-          <span id="final-high-score-value">0</span>
-        </p>
+        <div class="final-stat final-stat-high">
+          <span>HIGH SCORE</span>
+          <strong id="final-high-score-value">0</strong>
+        </div>
 
 
         <p
@@ -449,6 +507,7 @@
         id="restart-button"
         type="button"
       >
+        <span aria-hidden="true">↻</span>
         PLAY AGAIN
       </button>
 
