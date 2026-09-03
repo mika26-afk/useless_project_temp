@@ -1,8 +1,34 @@
+/* ============================== */
+/* GLOBAL */
+/* ============================== */
+
 body {
-  font-family: sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
-  margin-top: 50px;
+  margin: 0;
+  padding: 40px 20px;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #24243a 0%,
+      #0c0c14 45%,
+      #050508 100%
+    );
+
+  color: #f5f5f5;
+  min-height: 100vh;
+  box-sizing: border-box;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+
+/* ============================== */
+/* SCREENS */
+/* ============================== */
 
 .screen {
   max-width: 700px;
@@ -10,41 +36,425 @@ body {
   padding: 20px;
 }
 
+
+/* ============================== */
+/* BUTTONS */
+/* ============================== */
+
 button {
   font-family: inherit;
   font-size: 1rem;
+
   padding: 10px 18px;
   margin: 5px;
+
   cursor: pointer;
+
+  border-radius: 8px;
+  border: 1px solid #888;
+
+  background: #181820;
+  color: white;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 5px 18px rgba(255, 255, 255, 0.15);
 }
 
 button:disabled {
   cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .choice-button.selected {
   font-weight: bold;
+
+  box-shadow:
+    0 0 18px rgba(255, 255, 255, 0.25);
 }
+
+
+/* ============================== */
+/* SYSTEM AREA */
+/* ============================== */
+
+#system-area {
+  margin: 25px auto 35px;
+}
+
+#system-label {
+  margin-bottom: 20px;
+}
+
+
+/* ============================== */
+/* SLOT MACHINE */
+/* ============================== */
+
+#system-slot-machine {
+  width: 270px;
+
+  margin: 0 auto;
+  padding: 18px 18px 20px;
+
+  position: relative;
+
+  background:
+    linear-gradient(
+      145deg,
+      #3a3a46 0%,
+      #17171f 35%,
+      #292934 70%,
+      #111118 100%
+    );
+
+  border: 3px solid #555565;
+  border-radius: 18px;
+
+  box-shadow:
+    0 0 0 2px #101014,
+    0 0 25px rgba(150, 100, 255, 0.35),
+    inset 0 0 25px rgba(0, 0, 0, 0.8);
+}
+
+
+/* ============================== */
+/* MACHINE HEADER */
+/* ============================== */
+
+.slot-machine-top {
+  font-size: 0.72rem;
+
+  font-weight: bold;
+
+  letter-spacing: 3px;
+
+  margin-bottom: 12px;
+
+  color: #d8c8ff;
+
+  text-shadow:
+    0 0 5px rgba(180, 130, 255, 0.8),
+    0 0 12px rgba(180, 130, 255, 0.4);
+}
+
+
+/* ============================== */
+/* SLOT WINDOW */
+/* ============================== */
+
+.slot-window {
+  width: 220px;
+  height: 150px;
+
+  margin: 0 auto;
+
+  position: relative;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      #050507 0%,
+      #161620 50%,
+      #050507 100%
+    );
+
+  border: 4px solid #8b72c7;
+
+  border-radius: 8px;
+
+  box-shadow:
+    0 0 8px rgba(180, 130, 255, 0.8),
+    0 0 22px rgba(150, 90, 255, 0.55),
+    inset 0 0 18px rgba(0, 0, 0, 0.9);
+}
+
+
+/* ============================== */
+/* REEL */
+/* ============================== */
+
+.slot-reel {
+  width: 100%;
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  transform: translateY(0);
+
+  will-change: transform;
+}
+
+
+/* ============================== */
+/* REEL SYMBOLS */
+/* ============================== */
+
+.slot-symbol {
+  width: 100%;
+  height: 150px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 82px;
+
+  line-height: 1;
+
+  user-select: none;
+
+  filter:
+    drop-shadow(
+      0 0 10px rgba(255, 255, 255, 0.25)
+    );
+}
+
+
+/* ============================== */
+/* CENTER LINE */
+/* ============================== */
+
+.slot-center-line {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  height: 3px;
+
+  z-index: 10;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  box-shadow:
+    0 0 5px rgba(255, 255, 255, 0.9),
+    0 0 12px rgba(180, 130, 255, 0.9);
+
+  pointer-events: none;
+}
+
+
+/* ============================== */
+/* SIDE POINTERS */
+/* ============================== */
+
+.slot-window::before,
+.slot-window::after {
+  content: "";
+
+  position: absolute;
+
+  top: 50%;
+
+  width: 0;
+  height: 0;
+
+  transform: translateY(-50%);
+
+  z-index: 20;
+
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.slot-window::before {
+  left: 4px;
+
+  border-right:
+    13px solid #e8d8ff;
+}
+
+.slot-window::after {
+  right: 4px;
+
+  border-left:
+    13px solid #e8d8ff;
+}
+
+
+/* ============================== */
+/* SLOT STATUS */
+/* ============================== */
+
+.slot-status {
+  margin-top: 13px;
+
+  font-size: 0.8rem;
+
+  font-weight: bold;
+
+  letter-spacing: 3px;
+
+  color: #aaa;
+
+  transition:
+    color 0.2s ease,
+    text-shadow 0.2s ease;
+}
+
+#system-slot-machine.spinning .slot-status {
+  color: #f0dfff;
+
+  text-shadow:
+    0 0 5px rgba(200, 150, 255, 0.8),
+    0 0 15px rgba(180, 100, 255, 0.6);
+}
+
+#system-slot-machine.revealed .slot-status {
+  color: #ffffff;
+
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.9);
+}
+
+
+/* ============================== */
+/* MOTION BLUR */
+/* ============================== */
+
+#system-slot-machine.spinning .slot-symbol {
+  filter:
+    blur(1.8px)
+    drop-shadow(
+      0 0 12px rgba(255, 255, 255, 0.35)
+    );
+}
+
+
+/* ============================== */
+/* FINAL REVEAL */
+/* ============================== */
+
+#system-slot-machine.revealed .slot-window {
+  animation:
+    finalReveal 0.45s ease-out;
+}
+
+@keyframes finalReveal {
+
+  0% {
+    box-shadow:
+      0 0 8px rgba(180, 130, 255, 0.8),
+      0 0 22px rgba(150, 90, 255, 0.55);
+  }
+
+  50% {
+    box-shadow:
+      0 0 18px rgba(255, 255, 255, 1),
+      0 0 40px rgba(200, 150, 255, 0.9);
+  }
+
+  100% {
+    box-shadow:
+      0 0 8px rgba(180, 130, 255, 0.8),
+      0 0 22px rgba(150, 90, 255, 0.55);
+  }
+
+}
+
+
+/* ============================== */
+/* COUNTDOWN */
+/* ============================== */
+
+#countdown-area {
+  margin: 25px 0;
+}
+
+#countdown-number {
+  font-size: 4rem;
+
+  font-weight: bold;
+
+  margin: 10px 0;
+
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.6),
+    0 0 25px rgba(180, 130, 255, 0.5);
+}
+
+
+/* ============================== */
+/* REVEAL */
+/* ============================== */
+
+#reveal-area {
+  margin: 25px auto;
+
+  padding: 20px;
+
+  border: 1px solid #666;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.04);
+}
+
+
+/* ============================== */
+/* RESULT STATES */
+/* ============================== */
+
+.result-container {
+  margin: 20px auto;
+
+  padding: 15px;
+
+  border-radius: 8px;
+
+  background:
+    rgba(255, 255, 255, 0.05);
+}
+
+
+/* ============================== */
+/* GAME OVER */
+/* ============================== */
 
 .game-over-screen {
   max-width: 600px;
+
   margin: 0 auto;
+
   padding: 40px 20px;
 }
 
 .game-over-icon {
   font-size: 4rem;
+
   margin: 0 0 10px;
 }
 
 #game-over-heading {
   font-size: 3rem;
+
   margin: 0 0 10px;
 }
 
 #game-over-message {
   font-size: 1.5rem;
+
   font-weight: bold;
+
   margin: 10px 0;
 }
 
@@ -58,18 +468,23 @@ button:disabled {
 
 .final-stats p {
   font-size: 1.3rem;
+
   font-weight: bold;
+
   margin: 12px 0;
 }
 
 #final-high-score {
   font-size: 1rem;
+
   font-weight: normal;
 }
 
 #restart-button {
   font-size: 1.2rem;
+
   font-weight: bold;
+
   padding: 12px 24px;
 }
 
@@ -77,11 +492,21 @@ button:disabled {
   margin-top: 12px;
 }
 
+
+/* ============================== */
+/* KEYBOARD */
+/* ============================== */
+
 kbd {
   padding: 2px 6px;
+
   border: 1px solid #888;
+
   border-radius: 4px;
+
   font-family: monospace;
+
+  background: #111118;
 }
 
 
@@ -91,10 +516,15 @@ kbd {
 
 .honor-system {
   max-width: 520px;
+
   margin: 25px auto 10px;
+
   padding: 12px 16px;
+
   border: 1px solid #888;
+
   border-radius: 6px;
+
   font-size: 0.85rem;
 }
 
@@ -112,16 +542,50 @@ kbd {
 
 .honor-system-support {
   font-size: 0.75rem;
+
   opacity: 0.8;
 }
 
 
 /* ============================== */
-/* NEW HIGH SCORE */
+/* HIGH SCORE */
 /* ============================== */
 
 .new-high-score-message {
   font-size: 1rem !important;
+
   font-weight: bold;
+
   margin: 8px 0 !important;
+}
+
+
+/* ============================== */
+/* MOBILE */
+/* ============================== */
+
+@media (max-width: 500px) {
+
+  body {
+    padding: 25px 12px;
+  }
+
+  .screen {
+    padding: 10px;
+  }
+
+  #system-slot-machine {
+    width: 245px;
+  }
+
+  .slot-window {
+    width: 200px;
+    height: 140px;
+  }
+
+  .slot-symbol {
+    height: 140px;
+    font-size: 72px;
+  }
+
 }

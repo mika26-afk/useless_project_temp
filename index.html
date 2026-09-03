@@ -6,12 +6,15 @@
   <title>Eye Roulette 👀</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <!-- ============================== -->
   <!-- START SCREEN -->
   <!-- ============================== -->
+
   <section id="start-screen" class="screen">
+
     <header>
       <h1 id="game-title">
         EYE ROULETTE <span aria-hidden="true">👀</span>
@@ -23,6 +26,7 @@
     </header>
 
     <main>
+
       <p id="how-to-play">
         Each round, claim whether your eyes are open or closed, then see if the
         system catches you making eye contact. Survive as many rounds as you can
@@ -40,16 +44,20 @@
       <p id="start-instruction">
         Press <kbd>ENTER</kbd> to start
       </p>
+
     </main>
+
   </section>
 
 
   <!-- ============================== -->
   <!-- GAME SCREEN -->
   <!-- ============================== -->
+
   <section id="game-screen" class="screen" hidden>
 
     <header id="game-info">
+
       <p id="round-counter">
         Round: <span id="round-number">1</span>
       </p>
@@ -61,26 +69,119 @@
       <p id="high-score-display">
         High Score: <span id="high-score">0</span>
       </p>
+
     </header>
+
 
     <main>
 
-      <!-- System / computer eyes area -->
+      <!-- ============================== -->
+      <!-- SYSTEM / COMPUTER EYES -->
+      <!-- ============================== -->
+
       <section id="system-area" aria-labelledby="system-label">
-        <h2 id="system-label">System Eyes</h2>
 
-        <div id="system-eye-visual" aria-hidden="true">👀</div>
+        <h2 id="system-label">
+          System Eyes
+        </h2>
 
-        <p id="system-eye-state">???</p>
+
+        <!-- SLOT MACHINE -->
+
+        <div
+          id="system-slot-machine"
+          aria-label="System eye slot machine"
+        >
+
+          <div class="slot-machine-top">
+            SYSTEM REEL
+          </div>
+
+
+          <!-- Rectangular reel window -->
+
+          <div class="slot-window">
+
+            <!-- Fixed center selection line -->
+
+            <div
+              class="slot-center-line"
+              aria-hidden="true"
+            ></div>
+
+
+            <!-- Vertical reel -->
+
+            <div
+              id="system-eye-visual"
+              class="slot-reel"
+              aria-hidden="true"
+            >
+
+              <div class="slot-symbol">👀</div>
+              <div class="slot-symbol">😑</div>
+
+              <div class="slot-symbol">👀</div>
+              <div class="slot-symbol">😑</div>
+
+              <div class="slot-symbol">👀</div>
+              <div class="slot-symbol">😑</div>
+
+              <div class="slot-symbol">👀</div>
+              <div class="slot-symbol">😑</div>
+
+              <div class="slot-symbol">👀</div>
+              <div class="slot-symbol">😑</div>
+
+              <div class="slot-symbol">👀</div>
+              <div class="slot-symbol">😑</div>
+
+              <div class="slot-symbol">👀</div>
+              <div class="slot-symbol">😑</div>
+
+              <div class="slot-symbol">👀</div>
+              <div class="slot-symbol">😑</div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Machine status -->
+
+          <div
+            id="slot-status"
+            class="slot-status"
+            aria-live="polite"
+          >
+            READY
+          </div>
+
+        </div>
+
+
+        <!-- Actual system state -->
+
+        <p id="system-eye-state">
+          ???
+        </p>
+
       </section>
 
 
-      <!-- Player choice area -->
+      <!-- ============================== -->
+      <!-- PLAYER CHOICE -->
+      <!-- ============================== -->
+
       <section
         id="player-choice-area"
         aria-labelledby="player-choice-label"
       >
-        <h2 id="player-choice-label">Your Claim</h2>
+
+        <h2 id="player-choice-label">
+          Your Claim
+        </h2>
+
 
         <button
           id="choice-open"
@@ -90,6 +191,7 @@
           OPEN 👀
         </button>
 
+
         <button
           id="choice-closed"
           class="choice-button"
@@ -97,37 +199,60 @@
         >
           CLOSED 😑
         </button>
+
       </section>
 
 
-      <!-- Countdown -->
+      <!-- ============================== -->
+      <!-- COUNTDOWN -->
+      <!-- ============================== -->
+
       <section
         id="countdown-area"
         aria-live="polite"
         hidden
       >
-        <h2 id="countdown-label">Countdown</h2>
 
-        <p id="countdown-number">3</p>
+        <h2 id="countdown-label">
+          Countdown
+        </h2>
+
+        <p id="countdown-number">
+          3
+        </p>
+
       </section>
 
 
-      <!-- Reveal / result -->
+      <!-- ============================== -->
+      <!-- REVEAL -->
+      <!-- ============================== -->
+
       <section
         id="reveal-area"
         aria-live="polite"
         hidden
       >
-        <h2 id="reveal-label">Reveal</h2>
+
+        <h2 id="reveal-label">
+          Reveal
+        </h2>
 
         <p id="reveal-system-state"></p>
+
         <p id="reveal-survival-state"></p>
+
         <p id="reveal-point-state"></p>
+
         <p id="reveal-caught-state"></p>
+
       </section>
 
 
-      <!-- Result states -->
+      <!-- ============================== -->
+      <!-- RESULT STATES -->
+      <!-- ============================== -->
+
       <section id="result-states" hidden>
 
         <div
@@ -140,6 +265,7 @@
           </p>
         </div>
 
+
         <div
           id="result-point"
           class="result-container"
@@ -150,6 +276,7 @@
           </p>
         </div>
 
+
         <div
           id="result-closed-safe"
           class="result-container"
@@ -159,6 +286,7 @@
             You claimed CLOSED. You're safe, but no point this round.
           </p>
         </div>
+
 
         <div
           id="result-game-over"
@@ -173,21 +301,31 @@
       </section>
 
 
-      <!-- Status / message area -->
+      <!-- ============================== -->
+      <!-- STATUS -->
+      <!-- ============================== -->
+
       <p
         id="status-message"
         aria-live="polite"
       ></p>
 
 
-      <!-- Controls -->
+      <!-- ============================== -->
+      <!-- CONTROLS -->
+      <!-- ============================== -->
+
       <section
         id="game-controls"
         aria-labelledby="controls-label"
       >
-        <h2 id="controls-label">Controls</h2>
+
+        <h2 id="controls-label">
+          Controls
+        </h2>
 
         <ul id="controls-list">
+
           <li>
             <kbd>ENTER</kbd> — Claim eyes are OPEN
           </li>
@@ -195,16 +333,22 @@
           <li>
             <kbd>SPACE</kbd> — Claim eyes are CLOSED
           </li>
+
         </ul>
+
       </section>
 
 
-      <!-- Honor System -->
+      <!-- ============================== -->
+      <!-- HONOR SYSTEM -->
+      <!-- ============================== -->
+
       <aside
         id="honor-system-notice"
         class="honor-system"
         aria-labelledby="honor-system-title"
       >
+
         <p
           id="honor-system-title"
           class="honor-system-title"
@@ -220,21 +364,25 @@
         <p class="honor-system-support">
           Choose honestly. We literally cannot check.
         </p>
+
       </aside>
 
     </main>
+
   </section>
 
 
   <!-- ============================== -->
   <!-- GAME OVER SCREEN -->
   <!-- ============================== -->
+
   <section
     id="game-over-screen"
     class="screen game-over-screen"
     hidden
     aria-labelledby="game-over-heading"
   >
+
     <header>
 
       <p
@@ -262,6 +410,7 @@
 
     </header>
 
+
     <main>
 
       <div class="final-stats">
@@ -271,15 +420,18 @@
           <span id="final-score-value">0</span>
         </p>
 
+
         <p id="rounds-survived">
           ROUNDS:
           <span id="rounds-survived-value">0</span>
         </p>
 
+
         <p id="final-high-score">
           High Score:
           <span id="final-high-score-value">0</span>
         </p>
+
 
         <p
           id="new-high-score-message"
@@ -292,6 +444,7 @@
 
       </div>
 
+
       <button
         id="restart-button"
         type="button"
@@ -299,17 +452,20 @@
         PLAY AGAIN
       </button>
 
+
       <p id="restart-instruction">
         Press <kbd>R</kbd> to play again
       </p>
 
     </main>
+
   </section>
 
 
   <!-- ============================== -->
   <!-- JAVASCRIPT -->
   <!-- ============================== -->
+
   <script src="script.js" defer></script>
 
 </body>
