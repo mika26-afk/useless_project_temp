@@ -2,11 +2,11 @@
 
 
 
-# [Project Name] 🎯
+# EYE ROULETTE 🎯
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: Side-eye
 
 
 ### Team Members
@@ -15,13 +15,14 @@
 - Member 3: [Name] - [College]
 
 ### Project Description
-[2-3 lines about what your project does]
+Eye Roulette is a casino-style game where you gamble on whether the computer will open or close its eyes—and hope you don't "lock eyes." 
+The catch? The game can't actually see you, so everything runs on the player's honesty. Survive rounds, build your streak, and get the highest score without getting caught.
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+Eye contact is awkward. But what if you had to survive a game where making eye contact with a pair of digital eyes could instantly end your run? We decided this completely unnecessary problem deserved a completely unnecessary solution.
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+A casino-style game where the digital screen randomly opens or closes its eyes, and the player must honestly choose whether their eyes are open or closed. Open + open = caught; player's eyes open +  screen's eyes closed = +1 point.
 
 ## Technical Details
 ### Technologies/Components Used
@@ -31,10 +32,6 @@ For Software:
 - [Libraries used]
 - [Tools used]
 
-For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
 
 ### Implementation
 For Software:
