@@ -1,5 +1,5 @@
 // Eye Roulette 👀
-// MILESTONE 7: ROUND PROGRESSION
+// MILESTONE 8: POLISHED GAME OVER SCREEN
 
 let playerChoice = null;
 let systemChoice = null;
@@ -11,9 +11,8 @@ let roundsSurvived = 0;
 let isCountdownActive = false;
 let countdownInterval = null;
 let resultProcessed = false;
-
-// Stores which key can continue after a safe result
 let continueKey = null;
+let gameOver = false;
 
 
 // Get screens
@@ -52,14 +51,31 @@ const roundsSurvivedValue = document.getElementById("rounds-survived-value");
 const finalHighScoreValue = document.getElementById("final-high-score-value");
 
 
-// Start the game
+// Start a completely new game
 function startGame() {
   score = 0;
   roundNumber = 1;
   roundsSurvived = 0;
 
+  playerChoice = null;
+  systemChoice = null;
+
+  isCountdownActive = false;
+  resultProcessed = false;
+  continueKey = null;
+  gameOver = false;
+
+  if (countdownInterval !== null) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+
   updateScoreDisplay();
   updateRoundDisplay();
+
+  finalScoreValue.textContent = "0";
+  roundsSurvivedValue.textContent = "0";
+  finalHighScoreValue.textContent = "0";
 
   startScreen.hidden = true;
   gameOverScreen.hidden = true;
@@ -71,6 +87,7 @@ function startGame() {
 
 // Start a new round
 function startRound() {
+
   // Reset temporary round state
   playerChoice = null;
   systemChoice = null;
@@ -117,26 +134,30 @@ function startRound() {
 // Start the next round
 function startNextRound() {
 
-  // Only continue if the current round has finished safely
+  // Only continue after a completed safe result
   if (!resultProcessed) {
     return;
   }
 
-  // Do not continue after game over
-  if (!gameOverScreen.hidden) {
+  // Never continue after Game Over
+  if (gameOver) {
     return;
   }
 
-  // Increase round exactly once
+  // Increase the round exactly once
   roundNumber += 1;
 
-  // Reset the temporary state and prepare the new round
   startRound();
 }
 
 
 // Player chooses OPEN or CLOSED
 function selectPlayerChoice(choice) {
+
+  // Game Over is a terminal state
+  if (gameOver) {
+    return;
+  }
 
   // Don't allow another choice after one has been made
   if (playerChoice !== null) {
@@ -185,6 +206,10 @@ function selectPlayerChoice(choice) {
 // Start countdown
 function startCountdown() {
 
+  if (gameOver) {
+    return;
+  }
+
   // Prevent duplicate countdowns
   if (isCountdownActive) {
     return;
@@ -211,13 +236,12 @@ function startCountdown() {
       countdownNumber.textContent = countdown;
     } else {
 
-      // Stop timer
       clearInterval(countdownInterval);
       countdownInterval = null;
 
       isCountdownActive = false;
 
-      // Reveal first
+      // Reveal the existing system choice
       revealSystemChoice();
     }
 
@@ -228,9 +252,12 @@ function startCountdown() {
 // Reveal existing system choice
 function revealSystemChoice() {
 
-  // Do NOT randomize again.
-  // Use the systemChoice already generated for this round.
+  // Don't process anything after Game Over
+  if (gameOver) {
+    return;
+  }
 
+  // Do NOT randomize again
   if (systemChoice === "OPEN") {
     systemEyeState.textContent = "👀 OPEN";
     revealSystemState.textContent = "System: 👀 OPEN";
@@ -244,7 +271,6 @@ function revealSystemChoice() {
   revealArea.hidden = false;
   countdownArea.hidden = true;
 
-  // Process the result exactly once
   calculateResult();
 }
 
@@ -253,7 +279,7 @@ function revealSystemChoice() {
 function calculateResult() {
 
   // Prevent duplicate result processing
-  if (resultProcessed) {
+  if (resultProcessed || gameOver) {
     return;
   }
 
@@ -266,14 +292,13 @@ function calculateResult() {
     playerChoice === "OPEN" &&
     systemChoice === "OPEN"
   ) {
-    showResultGameOver();
+    showGameOver();
     return;
   }
 
 
   // --------------------------------
   // OPEN + CLOSED = +1
-  // ENTER continues
   // --------------------------------
   if (
     playerChoice === "OPEN" &&
@@ -282,7 +307,6 @@ function calculateResult() {
     score += 1;
     roundsSurvived += 1;
 
-    // ENTER is the only continuation key
     continueKey = "ENTER";
 
     updateScoreDisplay();
@@ -298,7 +322,6 @@ function calculateResult() {
 
   // --------------------------------
   // CLOSED + OPEN = +0
-  // SPACE continues
   // --------------------------------
   if (
     playerChoice === "CLOSED" &&
@@ -306,7 +329,6 @@ function calculateResult() {
   ) {
     roundsSurvived += 1;
 
-    // SPACE is the only continuation key
     continueKey = "SPACE";
 
     resultClosedSafe.hidden = false;
@@ -320,7 +342,6 @@ function calculateResult() {
 
   // --------------------------------
   // CLOSED + CLOSED = +0
-  // SPACE continues
   // --------------------------------
   if (
     playerChoice === "CLOSED" &&
@@ -328,7 +349,6 @@ function calculateResult() {
   ) {
     roundsSurvived += 1;
 
-    // SPACE is the only continuation key
     continueKey = "SPACE";
 
     resultClosedSafe.hidden = false;
@@ -341,23 +361,39 @@ function calculateResult() {
 }
 
 
-// Show game-over result
-function showResultGameOver() {
+// Show Game Over
+function showGameOver() {
 
-  resultGameOver.hidden = false;
+  // Prevent Game Over from being processed twice
+  if (gameOver) {
+    return;
+  }
 
-  // No continuation key after game over
+  gameOver = true;
+
+  // Stop countdown if one somehow remains active
+  if (countdownInterval !== null) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+
+  isCountdownActive = false;
   continueKey = null;
 
-  statusMessage.textContent =
-    "👀 EYE CONTACT! You got caught. Game Over.";
+  // Make sure player cannot interact with the old game
+  openButton.disabled = true;
+  closedButton.disabled = true;
 
-  // Update game-over information
+  // Display final values
   finalScoreValue.textContent = score;
   roundsSurvivedValue.textContent = roundsSurvived;
   finalHighScoreValue.textContent = score;
 
-  // Stop the current game
+  // Update status before leaving the game screen
+  statusMessage.textContent =
+    "💀 GAME OVER — EYE CONTACT DETECTED";
+
+  // Show Game Over screen
   gameScreen.hidden = true;
   gameOverScreen.hidden = false;
 }
@@ -384,11 +420,8 @@ function updateRoundDisplay() {
 }
 
 
-// Restart after game over
+// Restart after Game Over
 function restartGame() {
-  gameOverScreen.hidden = true;
-  gameScreen.hidden = false;
-
   startGame();
 }
 
@@ -422,13 +455,13 @@ document.addEventListener("keydown", function (event) {
       return;
     }
 
-    // Ignore ENTER during countdown
-    if (isCountdownActive) {
+    // Game Over: ENTER does nothing
+    if (gameOver) {
       return;
     }
 
-    // Ignore ENTER after game over
-    if (!gameOverScreen.hidden) {
+    // Ignore ENTER during countdown
+    if (isCountdownActive) {
       return;
     }
 
@@ -439,8 +472,8 @@ document.addEventListener("keydown", function (event) {
       return;
     }
 
-    // After a result:
-    // ENTER only continues if ENTER is the correct key
+    // After a safe result:
+    // ENTER continues only when ENTER is the correct key
     if (
       resultProcessed &&
       continueKey === "ENTER"
@@ -457,6 +490,11 @@ document.addEventListener("keydown", function (event) {
   // -------------------------------
   if (event.code === "Space") {
     event.preventDefault();
+
+    // Game Over: SPACE does nothing
+    if (gameOver) {
+      return;
+    }
 
     // Ignore SPACE outside the game
     if (!startScreen.hidden || !gameOverScreen.hidden) {
@@ -475,8 +513,8 @@ document.addEventListener("keydown", function (event) {
       return;
     }
 
-    // After a result:
-    // SPACE only continues if SPACE is the correct key
+    // After a safe result:
+    // SPACE continues only when SPACE is the correct key
     if (
       resultProcessed &&
       continueKey === "SPACE"
@@ -493,7 +531,7 @@ document.addEventListener("keydown", function (event) {
   // -------------------------------
   if (event.key.toLowerCase() === "r") {
 
-    if (!gameOverScreen.hidden) {
+    if (gameOver) {
       event.preventDefault();
       restartGame();
     }
@@ -506,8 +544,7 @@ document.addEventListener("keydown", function (event) {
   // SHIFT
   // -------------------------------
   if (event.key === "Shift") {
-    // Preserve SHIFT as an available game control.
-    // No additional round progression happens here.
+    // Existing SHIFT behavior is preserved.
     return;
   }
 

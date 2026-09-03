@@ -50,7 +50,6 @@
       <section id="system-area" aria-labelledby="system-label">
         <h2 id="system-label">System Eyes</h2>
 
-        <!-- System state remains hidden during this milestone -->
         <div id="system-eye-visual" aria-hidden="true">👀</div>
         <p id="system-eye-state">???</p>
       </section>
@@ -76,13 +75,13 @@
         </button>
       </section>
 
-      <!-- Countdown - not part of this milestone -->
+      <!-- Countdown -->
       <section id="countdown-area" aria-live="polite" hidden>
         <h2 id="countdown-label">Countdown</h2>
         <p id="countdown-number">3</p>
       </section>
 
-      <!-- Reveal / result - not part of this milestone -->
+      <!-- Reveal / result -->
       <section id="reveal-area" aria-live="polite" hidden>
         <h2 id="reveal-label">Reveal</h2>
         <p id="reveal-system-state"></p>
@@ -91,7 +90,7 @@
         <p id="reveal-caught-state"></p>
       </section>
 
-      <!-- Result states - not part of this milestone -->
+      <!-- Result states -->
       <section id="result-states" hidden>
 
         <div id="result-safe" class="result-container" hidden>
@@ -131,35 +130,55 @@
   <!-- ============================== -->
   <!-- GAME OVER SCREEN -->
   <!-- ============================== -->
-  <section id="game-over-screen" class="screen" hidden>
+  <section
+    id="game-over-screen"
+    class="screen game-over-screen"
+    hidden
+    aria-labelledby="game-over-heading"
+  >
     <header>
+      <p class="game-over-icon" aria-hidden="true">💀</p>
+
       <h1 id="game-over-heading">GAME OVER</h1>
-      <p id="game-over-message">Eye contact detected. You've been caught.</p>
+
+      <p
+        id="game-over-message"
+        aria-live="assertive"
+        role="status"
+      >
+        EYE CONTACT DETECTED
+      </p>
+
+      <p id="game-over-submessage">
+        You looked. The system looked. That was a mistake.
+      </p>
     </header>
 
     <main>
-      <p id="final-score">
-        Final Score: <span id="final-score-value">0</span>
-      </p>
+      <div class="final-stats">
+        <p id="final-score">
+          SCORE: <span id="final-score-value">0</span>
+        </p>
 
-      <p id="rounds-survived">
-        Rounds Survived: <span id="rounds-survived-value">0</span>
-      </p>
+        <p id="rounds-survived">
+          ROUNDS: <span id="rounds-survived-value">0</span>
+        </p>
 
-      <p id="final-high-score">
-        High Score: <span id="final-high-score-value">0</span>
-      </p>
+        <p id="final-high-score">
+          High Score: <span id="final-high-score-value">0</span>
+        </p>
+      </div>
 
-      <button id="restart-button" type="button">Restart</button>
+      <button id="restart-button" type="button">PLAY AGAIN</button>
 
       <p id="restart-instruction">
-        Press <kbd>R</kbd> to restart
+        Press <kbd>R</kbd> to play again
       </p>
     </main>
   </section>
 
   <!-- ============================== -->
-  <!-- HONOR SYSTEM NOTICE (GLOBAL) -->
+  <!-- HONOR SYSTEM NOTICE -->
   <!-- ============================== -->
   <footer id="honor-system-notice">
     <p>
