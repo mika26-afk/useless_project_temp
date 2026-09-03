@@ -1,8 +1,11 @@
 // Eye Roulette 👀
-// PLAYER CHOICE + RANDOM SYSTEM CHOICE
+// MILESTONE 5: Countdown + System Reveal
 
 let playerChoice = null;
 let systemChoice = null;
+
+let isCountdownActive = false;
+let countdownInterval = null;
 
 // Get elements
 const startScreen = document.getElementById("start-screen");
@@ -13,41 +16,72 @@ const openButton = document.getElementById("choice-open");
 const closedButton = document.getElementById("choice-closed");
 
 const statusMessage = document.getElementById("status-message");
+
 const systemEyeState = document.getElementById("system-eye-state");
 
-// Start game / round
+const countdownArea = document.getElementById("countdown-area");
+const countdownNumber = document.getElementById("countdown-number");
+
+const revealArea = document.getElementById("reveal-area");
+const revealSystemState = document.getElementById("reveal-system-state");
+
+
+// Start game / new round
 function startGame() {
-  // Reset both choices for a new round
+  // Reset choices for a new round
   playerChoice = null;
   systemChoice = null;
+
+  // Reset countdown state
+  isCountdownActive = false;
+
+  if (countdownInterval !== null) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
 
   startScreen.hidden = true;
   gameScreen.hidden = false;
 
+  // Reset buttons
   openButton.disabled = false;
   closedButton.disabled = false;
 
   openButton.classList.remove("selected");
   closedButton.classList.remove("selected");
 
-  // Keep the system state hidden
+  // Keep system state hidden
   systemEyeState.textContent = "???";
+
+  // Reset countdown and hide it
+  countdownNumber.textContent = "3";
+  countdownArea.hidden = true;
+
+  // Hide reveal area until countdown finishes
+  revealArea.hidden = true;
+  revealSystemState.textContent = "";
 
   statusMessage.textContent = "Choose your claim: OPEN 👀 or CLOSED 😑";
 }
 
+
 // Player chooses OPEN or CLOSED
 function selectPlayerChoice(choice) {
 
-  // Don't allow another player choice after one is made
+  // Don't allow another choice after one is made
   if (playerChoice !== null) {
+    return;
+  }
+
+  // Don't allow choices while countdown is running
+  if (isCountdownActive) {
     return;
   }
 
   // Save the player's choice
   playerChoice = choice;
 
-  // Visually mark the selected button
+  // Remove previous selection
   openButton.classList.remove("selected");
   closedButton.classList.remove("selected");
 
@@ -73,11 +107,89 @@ function selectPlayerChoice(choice) {
   console.log("Player choice:", playerChoice);
   console.log("System choice:", systemChoice);
 
-  // IMPORTANT:
-  // The system choice is stored internally only.
-  // Do not reveal it on the screen.
-  // No scoring, result, countdown, or game-over logic yet.
+  // Start countdown automatically
+  startCountdown();
 }
+
+
+// Start the 3-second countdown
+function startCountdown() {
+
+  // Prevent duplicate countdowns
+  if (isCountdownActive) {
+    return;
+  }
+
+  isCountdownActive = true;
+
+  // Keep system state hidden
+  systemEyeState.textContent = "???";
+
+  // Hide any previous reveal
+  revealArea.hidden = true;
+  revealSystemState.textContent = "";
+
+  // Show countdown
+  countdownArea.hidden = false;
+  countdownNumber.textContent = "3";
+
+  let countdown = 3;
+
+  countdownInterval = setInterval(function () {
+
+    countdown--;
+
+    if (countdown > 0) {
+      countdownNumber.textContent = countdown;
+    } else {
+      // Countdown has finished
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+
+      isCountdownActive = false;
+
+      revealSystemChoice();
+    }
+
+  }, 1000);
+}
+
+
+// Reveal the already-generated system choice
+function revealSystemChoice() {
+
+  // Make sure we use the existing systemChoice.
+  // DO NOT generate another random value here.
+
+  if (systemChoice === "OPEN") {
+    systemEyeState.textContent = "👀 OPEN";
+    revealSystemState.textContent = "System: 👀 OPEN";
+  }
+
+  if (systemChoice === "CLOSED") {
+    systemEyeState.textContent = "😑 CLOSED";
+    revealSystemState.textContent = "System: 😑 CLOSED";
+  }
+
+  // Show the reveal area
+  revealArea.hidden = false;
+
+  // Hide countdown after it finishes
+  countdownArea.hidden = true;
+
+  statusMessage.textContent =
+    `You chose ${playerChoice}. The system has revealed its state.`;
+
+  console.log("Reveal:", systemChoice);
+
+  // IMPORTANT:
+  // This is where this milestone stops.
+  // No result calculation.
+  // No scoring.
+  // No game over.
+  // No next round.
+}
+
 
 // Button controls
 startButton.addEventListener("click", startGame);
@@ -90,6 +202,7 @@ closedButton.addEventListener("click", function () {
   selectPlayerChoice("CLOSED");
 });
 
+
 // Keyboard controls
 document.addEventListener("keydown", function (event) {
 
@@ -100,19 +213,23 @@ document.addEventListener("keydown", function (event) {
     // If game hasn't started, ENTER starts it
     if (gameScreen.hidden) {
       startGame();
-    } else {
-      // During the game, ENTER chooses OPEN
+    }
+    // During the game, ENTER attempts to choose OPEN.
+    // The function will ignore it if countdown is active.
+    else {
       selectPlayerChoice("OPEN");
     }
 
     return;
   }
 
+
   // SPACE
   if (event.code === "Space") {
     event.preventDefault();
 
-    // During the game, SPACE chooses CLOSED
+    // During the game, SPACE attempts to choose CLOSED.
+    // The function will ignore it if countdown is active.
     if (!gameScreen.hidden) {
       selectPlayerChoice("CLOSED");
     }
