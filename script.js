@@ -1,23 +1,34 @@
 // Eye Roulette 👀
-// MILESTONE 5: Countdown + System Reveal
+// MILESTONE 6: Final Game Logic
 
 let playerChoice = null;
 let systemChoice = null;
 
+let score = 0;
+let roundNumber = 1;
+let roundsSurvived = 0;
+
 let isCountdownActive = false;
 let countdownInterval = null;
+let resultProcessed = false;
 
-// Get elements
+// Get screens
 const startScreen = document.getElementById("start-screen");
 const gameScreen = document.getElementById("game-screen");
+const gameOverScreen = document.getElementById("game-over-screen");
 
+// Get buttons
 const startButton = document.getElementById("start-button");
 const openButton = document.getElementById("choice-open");
 const closedButton = document.getElementById("choice-closed");
+const restartButton = document.getElementById("restart-button");
 
-const statusMessage = document.getElementById("status-message");
+// Get game display elements
+const roundNumberDisplay = document.getElementById("round-number");
+const currentScoreDisplay = document.getElementById("current-score");
 
 const systemEyeState = document.getElementById("system-eye-state");
+const statusMessage = document.getElementById("status-message");
 
 const countdownArea = document.getElementById("countdown-area");
 const countdownNumber = document.getElementById("countdown-number");
@@ -25,23 +36,48 @@ const countdownNumber = document.getElementById("countdown-number");
 const revealArea = document.getElementById("reveal-area");
 const revealSystemState = document.getElementById("reveal-system-state");
 
+// Get result containers
+const resultSafe = document.getElementById("result-safe");
+const resultPoint = document.getElementById("result-point");
+const resultClosedSafe = document.getElementById("result-closed-safe");
+const resultGameOver = document.getElementById("result-game-over");
 
-// Start game / new round
+// Get game-over display elements
+const finalScoreValue = document.getElementById("final-score-value");
+const roundsSurvivedValue = document.getElementById("rounds-survived-value");
+const finalHighScoreValue = document.getElementById("final-high-score-value");
+
+
+// Start the game
 function startGame() {
-  // Reset choices for a new round
+  score = 0;
+  roundNumber = 1;
+  roundsSurvived = 0;
+
+  updateScoreDisplay();
+  updateRoundDisplay();
+
+  startScreen.hidden = true;
+  gameOverScreen.hidden = true;
+  gameScreen.hidden = false;
+
+  startRound();
+}
+
+
+// Start a new round
+function startRound() {
+  // Reset round-specific state
   playerChoice = null;
   systemChoice = null;
 
-  // Reset countdown state
   isCountdownActive = false;
+  resultProcessed = false;
 
   if (countdownInterval !== null) {
     clearInterval(countdownInterval);
     countdownInterval = null;
   }
-
-  startScreen.hidden = true;
-  gameScreen.hidden = false;
 
   // Reset buttons
   openButton.disabled = false;
@@ -53,15 +89,22 @@ function startGame() {
   // Keep system state hidden
   systemEyeState.textContent = "???";
 
-  // Reset countdown and hide it
+  // Reset countdown
   countdownNumber.textContent = "3";
   countdownArea.hidden = true;
 
-  // Hide reveal area until countdown finishes
+  // Hide reveal
   revealArea.hidden = true;
   revealSystemState.textContent = "";
 
-  statusMessage.textContent = "Choose your claim: OPEN 👀 or CLOSED 😑";
+  // Hide all result containers
+  hideAllResults();
+
+  statusMessage.textContent =
+    "Choose your claim: OPEN 👀 or CLOSED 😑";
+
+  updateRoundDisplay();
+  updateScoreDisplay();
 }
 
 
@@ -73,15 +116,15 @@ function selectPlayerChoice(choice) {
     return;
   }
 
-  // Don't allow choices while countdown is running
+  // Don't allow choices during countdown
   if (isCountdownActive) {
     return;
   }
 
-  // Save the player's choice
+  // Save player's choice
   playerChoice = choice;
 
-  // Remove previous selection
+  // Mark the selected button
   openButton.classList.remove("selected");
   closedButton.classList.remove("selected");
 
@@ -95,7 +138,7 @@ function selectPlayerChoice(choice) {
     statusMessage.textContent = "You chose CLOSED 😑";
   }
 
-  // Disable both buttons after choosing
+  // Disable both buttons
   openButton.disabled = true;
   closedButton.disabled = true;
 
@@ -107,12 +150,12 @@ function selectPlayerChoice(choice) {
   console.log("Player choice:", playerChoice);
   console.log("System choice:", systemChoice);
 
-  // Start countdown automatically
+  // Automatically begin countdown
   startCountdown();
 }
 
 
-// Start the 3-second countdown
+// Start the countdown
 function startCountdown() {
 
   // Prevent duplicate countdowns
@@ -125,15 +168,15 @@ function startCountdown() {
   // Keep system state hidden
   systemEyeState.textContent = "???";
 
-  // Hide any previous reveal
+  // Hide previous reveal/result
   revealArea.hidden = true;
-  revealSystemState.textContent = "";
+  hideAllResults();
 
   // Show countdown
   countdownArea.hidden = false;
-  countdownNumber.textContent = "3";
 
   let countdown = 3;
+  countdownNumber.textContent = countdown;
 
   countdownInterval = setInterval(function () {
 
@@ -142,12 +185,13 @@ function startCountdown() {
     if (countdown > 0) {
       countdownNumber.textContent = countdown;
     } else {
-      // Countdown has finished
+      // Stop timer
       clearInterval(countdownInterval);
       countdownInterval = null;
 
       isCountdownActive = false;
 
+      // Reveal first, then calculate the result
       revealSystemChoice();
     }
 
@@ -155,11 +199,11 @@ function startCountdown() {
 }
 
 
-// Reveal the already-generated system choice
+// Reveal the existing system choice
 function revealSystemChoice() {
 
-  // Make sure we use the existing systemChoice.
-  // DO NOT generate another random value here.
+  // Do NOT generate another random value.
+  // Use the systemChoice that was already generated.
 
   if (systemChoice === "OPEN") {
     systemEyeState.textContent = "👀 OPEN";
@@ -171,27 +215,169 @@ function revealSystemChoice() {
     revealSystemState.textContent = "System: 😑 CLOSED";
   }
 
-  // Show the reveal area
+  // Show reveal
   revealArea.hidden = false;
 
-  // Hide countdown after it finishes
+  // Hide countdown
   countdownArea.hidden = true;
 
-  statusMessage.textContent =
-    `You chose ${playerChoice}. The system has revealed its state.`;
-
-  console.log("Reveal:", systemChoice);
-
-  // IMPORTANT:
-  // This is where this milestone stops.
-  // No result calculation.
-  // No scoring.
-  // No game over.
-  // No next round.
+  // Now process the game rules
+  calculateResult();
 }
 
 
-// Button controls
+// Calculate the result exactly once
+function calculateResult() {
+
+  // Prevent duplicate result processing
+  if (resultProcessed) {
+    return;
+  }
+
+  resultProcessed = true;
+
+  // --------------------------------
+  // RULE 1: OPEN + OPEN
+  // --------------------------------
+  if (
+    playerChoice === "OPEN" &&
+    systemChoice === "OPEN"
+  ) {
+    showResultGameOver();
+    return;
+  }
+
+
+  // --------------------------------
+  // RULE 2: OPEN + CLOSED
+  // --------------------------------
+  if (
+    playerChoice === "OPEN" &&
+    systemChoice === "CLOSED"
+  ) {
+    score += 1;
+    roundsSurvived += 1;
+
+    updateScoreDisplay();
+
+    resultPoint.hidden = false;
+
+    statusMessage.textContent =
+      "😑 THEY BLINKED! You survived. +1 POINT";
+
+    return;
+  }
+
+
+  // --------------------------------
+  // RULE 3: CLOSED + OPEN
+  // --------------------------------
+  if (
+    playerChoice === "CLOSED" &&
+    systemChoice === "OPEN"
+  ) {
+    roundsSurvived += 1;
+
+    resultClosedSafe.hidden = false;
+
+    statusMessage.textContent =
+      "👀 THEY WERE WATCHING. You survived. +0 POINTS";
+
+    return;
+  }
+
+
+  // --------------------------------
+  // RULE 4: CLOSED + CLOSED
+  // --------------------------------
+  if (
+    playerChoice === "CLOSED" &&
+    systemChoice === "CLOSED"
+  ) {
+    roundsSurvived += 1;
+
+    resultClosedSafe.hidden = false;
+
+    statusMessage.textContent =
+      "😑 BOTH HID. You survived. +0 POINTS";
+
+    return;
+  }
+}
+
+
+// Show game-over result
+function showResultGameOver() {
+
+  resultGameOver.hidden = false;
+
+  statusMessage.textContent =
+    "👀 EYE CONTACT! You got caught. Game Over.";
+
+  // Update game-over screen values
+  finalScoreValue.textContent = score;
+  roundsSurvivedValue.textContent = roundsSurvived;
+  finalHighScoreValue.textContent = score;
+
+  // Stop the current game screen
+  gameScreen.hidden = true;
+  gameOverScreen.hidden = false;
+}
+
+
+// Continue to the next round
+function continueToNextRound() {
+
+  // Only allow continuing after a result
+  if (!resultProcessed) {
+    return;
+  }
+
+  // Do not continue if the game is over
+  if (!gameOverScreen.hidden) {
+    return;
+  }
+
+  roundNumber += 1;
+
+  startRound();
+}
+
+
+// Hide all result containers
+function hideAllResults() {
+  resultSafe.hidden = true;
+  resultPoint.hidden = true;
+  resultClosedSafe.hidden = true;
+  resultGameOver.hidden = true;
+}
+
+
+// Update score display
+function updateScoreDisplay() {
+  currentScoreDisplay.textContent = score;
+}
+
+
+// Update round display
+function updateRoundDisplay() {
+  roundNumberDisplay.textContent = roundNumber;
+}
+
+
+// Restart after game over
+function restartGame() {
+  gameOverScreen.hidden = true;
+  gameScreen.hidden = false;
+
+  startGame();
+}
+
+
+// -------------------------------
+// BUTTON CONTROLS
+// -------------------------------
+
 startButton.addEventListener("click", startGame);
 
 openButton.addEventListener("click", function () {
@@ -202,22 +388,45 @@ closedButton.addEventListener("click", function () {
   selectPlayerChoice("CLOSED");
 });
 
+restartButton.addEventListener("click", restartGame);
 
-// Keyboard controls
+
+// -------------------------------
+// KEYBOARD CONTROLS
+// -------------------------------
+
 document.addEventListener("keydown", function (event) {
 
   // ENTER
   if (event.key === "Enter") {
     event.preventDefault();
 
-    // If game hasn't started, ENTER starts it
-    if (gameScreen.hidden) {
+    // Start game from start screen
+    if (!startScreen.hidden) {
       startGame();
+      return;
     }
-    // During the game, ENTER attempts to choose OPEN.
-    // The function will ignore it if countdown is active.
-    else {
+
+    // Ignore ENTER during countdown
+    if (isCountdownActive) {
+      return;
+    }
+
+    // If game over, do nothing.
+    // Restart uses R.
+    if (!gameOverScreen.hidden) {
+      return;
+    }
+
+    // If no choice has been made, ENTER chooses OPEN
+    if (playerChoice === null) {
       selectPlayerChoice("OPEN");
+      return;
+    }
+
+    // After a safe result, ENTER continues
+    if (resultProcessed) {
+      continueToNextRound();
     }
 
     return;
@@ -228,14 +437,41 @@ document.addEventListener("keydown", function (event) {
   if (event.code === "Space") {
     event.preventDefault();
 
-    // During the game, SPACE attempts to choose CLOSED.
-    // The function will ignore it if countdown is active.
-    if (!gameScreen.hidden) {
+    // Ignore SPACE outside the game
+    if (!gameOverScreen.hidden || !startScreen.hidden) {
+      return;
+    }
+
+    // Ignore SPACE during countdown
+    if (isCountdownActive) {
+      return;
+    }
+
+    // If no choice has been made, SPACE chooses CLOSED
+    if (playerChoice === null) {
       selectPlayerChoice("CLOSED");
+      return;
+    }
+
+    // After a safe result, SPACE continues
+    if (resultProcessed) {
+      continueToNextRound();
     }
 
     return;
   }
+
+
+  // R = restart after game over
+  if (event.key.toLowerCase() === "r") {
+    if (!gameOverScreen.hidden) {
+      event.preventDefault();
+      restartGame();
+    }
+
+    return;
+  }
+
 
   // Any other key does nothing
 });
