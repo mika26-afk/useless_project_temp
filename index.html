@@ -1,189 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#08070d">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Eye Roulette — a retro arcade game of courage, eye contact, and questionable decisions."
+  >
+
   <title>Eye Roulette 👀</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
+
 
 <body>
 
-  <!-- ============================== -->
-  <!-- START SCREEN -->
-  <!-- ============================== -->
+  <!-- ===================================================== -->
+  <!-- FULLSCREEN BUTTON                                     -->
+  <!-- ===================================================== -->
 
-  <section id="start-screen" class="screen">
+  <button
+    id="fullscreen-button"
+    type="button"
+    aria-label="Enter fullscreen"
+    title="Enter fullscreen"
+  >
+    ⛶ FULLSCREEN
+  </button>
 
-    <header class="start-header">
-      <div class="casino-lights" aria-hidden="true"></div>
 
-      <p class="eyebrow">◆ THE HONESTY CASINO ◆</p>
+  <!-- ===================================================== -->
+  <!-- START SCREEN                                          -->
+  <!-- ===================================================== -->
 
-      <h1 id="game-title">
-        EYE ROULETTE <span aria-hidden="true">👀</span>
-      </h1>
+  <main>
 
-      <p id="tagline">
-        A game of nerve, honesty, and questionable decision-making.
-      </p>
-    </header>
+    <section
+      id="start-screen"
+      class="screen"
+      aria-labelledby="game-title"
+    >
 
-    <main>
+      <div class="panel">
 
-      <div class="start-panel">
+        <header>
 
-        <div class="panel-label">HOW TO PLAY</div>
+          <h1 id="game-title">
+            EYE ROULETTE 👀
+          </h1>
 
-        <p id="how-to-play">
-          Each round, claim whether your eyes are open or closed, then see if the
-          system catches you making eye contact. Survive as many rounds as you can
-          without getting caught.
-        </p>
+          <p class="subtitle">
+            THE ULTIMATE TEST OF COURAGE,
+            HONESTY &amp; QUESTIONABLE DECISIONS.
+          </p>
 
-        <p id="honor-note-start" class="honor-note">
-          This game runs entirely on the honor system — there's no camera watching you.
-        </p>
+        </header>
 
-        <button id="start-button" type="button">
-          <span class="button-icon" aria-hidden="true">▶</span>
-          START GAME
-        </button>
 
-        <p id="start-instruction">
-          Press <kbd>ENTER</kbd> to start
-        </p>
+        <div class="rules">
+
+          <h2>
+            HOW TO PLAY
+          </h2>
+
+          <p>
+            Choose whether you will
+            <strong>OPEN</strong>
+            or
+            <strong>CLOSE</strong>
+            your eyes.
+          </p>
+
+          <p>
+            The system secretly chooses too.
+          </p>
+
+          <p>
+            If both eyes are OPEN...
+            <strong>GAME OVER.</strong>
+          </p>
+
+          <p>
+            If you OPEN and the system CLOSES,
+            you survive and gain
+            <strong>+1 POINT.</strong>
+          </p>
+
+          <p>
+            If you CLOSE your eyes,
+            you survive — but gain
+            <strong>0 POINTS.</strong>
+          </p>
+
+        </div>
+
+
+        <div class="honor-system">
+
+          NO CAMERA.<br>
+          NO TRACKING.<br>
+          NO PROOF.<br>
+          JUST THE HONOR SYSTEM.
+
+        </div>
+
+
+        <div class="start-area">
+
+          <button
+            id="start-button"
+            type="button"
+          >
+            ▶ START GAME
+          </button>
+
+        </div>
 
       </div>
 
-    </main>
-
-  </section>
+    </section>
 
 
-  <!-- ============================== -->
-  <!-- GAME SCREEN -->
-  <!-- ============================== -->
+    <!-- =================================================== -->
+    <!-- GAME SCREEN                                          -->
+    <!-- =================================================== -->
 
-  <section id="game-screen" class="screen" hidden>
+    <section
+      id="game-screen"
+      class="screen"
+      aria-labelledby="round-heading"
+      hidden
+    >
 
-    <header id="game-info">
-
-      <div class="hud-card">
-        <span class="hud-label">ROUND</span>
-        <strong id="round-counter">
-          <span id="round-number">1</span>
-        </strong>
-      </div>
-
-      <div class="hud-card score-card">
-        <span class="hud-label">SCORE</span>
-        <strong id="score-display">
-          <span id="current-score">0</span>
-        </strong>
-      </div>
-
-      <div class="hud-card high-score-card">
-        <span class="hud-label">HIGH SCORE</span>
-        <strong id="high-score-display">
-          <span id="high-score">0</span>
-        </strong>
-      </div>
-
-    </header>
+      <div class="panel">
 
 
-    <main>
+        <!-- GAME HEADER -->
 
-      <!-- ============================== -->
-      <!-- SYSTEM / COMPUTER EYES -->
-      <!-- ============================== -->
+        <header class="game-header">
 
-      <section id="system-area" aria-labelledby="system-label">
+          <div>
 
-        <h2 id="system-label">
-          <span aria-hidden="true">◆</span>
-          SYSTEM EYES
-          <span aria-hidden="true">◆</span>
-        </h2>
+            <h2 id="round-heading">
+              ROUND
+              <span id="round-number">1</span>
+            </h2>
 
-        <p class="section-subtitle">
-          THE REEL KNOWS. YOU DON'T.
-        </p>
-
-
-        <!-- SLOT MACHINE -->
-
-        <div
-          id="system-slot-machine"
-          aria-label="System eye slot machine"
-        >
-
-          <div class="machine-top-light" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
           </div>
 
-          <div class="slot-machine-top">
-            SYSTEM REEL
-          </div>
 
+          <div
+            class="score-board"
+            aria-label="Score information"
+          >
 
-          <!-- Rectangular reel window -->
+            <div class="score-item">
 
-          <div class="slot-window">
+              <span class="score-label">
+                SCORE
+              </span>
 
-            <!-- Fixed center selection indicator -->
+              <span
+                id="current-score"
+                class="score-value"
+              >
+                0
+              </span>
 
-            <div
-              class="slot-selection-indicators"
-              aria-hidden="true"
-            >
-              <span class="indicator-left">▶</span>
-              <span class="indicator-right">◀</span>
             </div>
 
 
-            <!-- Vertical reel -->
+            <div class="score-item">
+
+              <span class="score-label">
+                HIGH SCORE
+              </span>
+
+              <span
+                id="high-score"
+                class="score-value"
+              >
+                0
+              </span>
+
+            </div>
+
+          </div>
+
+        </header>
+
+
+        <!-- SYSTEM AREA -->
+
+        <section
+          class="system-area"
+          aria-labelledby="system-title"
+        >
+
+          <div
+            id="system-title"
+            class="system-label"
+          >
+            SYSTEM EYES
+          </div>
+
+
+          <div
+            id="system-slot-machine"
+            class="slot-machine"
+            aria-live="polite"
+            aria-label="System eye roulette"
+          >
 
             <div
               id="system-eye-visual"
               class="slot-reel"
-              aria-hidden="true"
             >
 
-              <div class="slot-symbol">👀</div>
-              <div class="slot-symbol">😑</div>
+              <div class="slot-symbol">
+                👀
+              </div>
 
-              <div class="slot-symbol">👀</div>
-              <div class="slot-symbol">😑</div>
+              <div class="slot-symbol">
+                😑
+              </div>
 
-              <div class="slot-symbol">👀</div>
-              <div class="slot-symbol">😑</div>
+              <div class="slot-symbol">
+                👀
+              </div>
 
-              <div class="slot-symbol">👀</div>
-              <div class="slot-symbol">😑</div>
+              <div class="slot-symbol">
+                😑
+              </div>
 
-              <div class="slot-symbol">👀</div>
-              <div class="slot-symbol">😑</div>
+              <div class="slot-symbol">
+                👀
+              </div>
 
-              <div class="slot-symbol">👀</div>
-              <div class="slot-symbol">😑</div>
+              <div class="slot-symbol">
+                😑
+              </div>
 
-              <div class="slot-symbol">👀</div>
-              <div class="slot-symbol">😑</div>
+              <div class="slot-symbol">
+                👀
+              </div>
 
-              <div class="slot-symbol">👀</div>
-              <div class="slot-symbol">😑</div>
+              <div class="slot-symbol">
+                😑
+              </div>
+
+              <div class="slot-symbol">
+                👀
+              </div>
+
+              <div class="slot-symbol">
+                😑
+              </div>
+
+              <div class="slot-symbol">
+                👀
+              </div>
+
+              <div class="slot-symbol">
+                😑
+              </div>
+
+              <div class="slot-symbol">
+                👀
+              </div>
+
+              <div class="slot-symbol">
+                😑
+              </div>
+
+              <div class="slot-symbol">
+                👀
+              </div>
+
+              <div class="slot-symbol">
+                😑
+              </div>
 
             </div>
 
           </div>
 
-
-          <!-- Machine status -->
 
           <div
             id="slot-status"
@@ -193,339 +306,362 @@
             READY
           </div>
 
-        </div>
 
-
-        <!-- Actual system state -->
-
-        <p id="system-eye-state">
-          ???
-        </p>
-
-      </section>
-
-
-      <!-- ============================== -->
-      <!-- PLAYER CHOICE -->
-      <!-- ============================== -->
-
-      <section
-        id="player-choice-area"
-        aria-labelledby="player-choice-label"
-      >
-
-        <h2 id="player-choice-label">
-          YOUR CLAIM
-        </h2>
-
-        <p class="section-subtitle">
-          TELL THE TRUTH. OR DON'T.
-        </p>
-
-
-        <div class="choice-buttons">
-
-          <button
-            id="choice-open"
-            class="choice-button"
-            type="button"
+          <div
+            id="system-eye-state"
+            class="system-state"
+            aria-live="polite"
           >
-            <span class="choice-symbol" aria-hidden="true">👀</span>
-            <span>OPEN</span>
-          </button>
+            ???
+          </div>
+
+        </section>
 
 
-          <button
-            id="choice-closed"
-            class="choice-button"
-            type="button"
+        <!-- CHOICE AREA -->
+
+        <section
+          class="choice-area"
+          aria-labelledby="choice-title"
+        >
+
+          <div
+            id="choice-title"
+            class="choice-title"
           >
-            <span class="choice-symbol" aria-hidden="true">😑</span>
-            <span>CLOSED</span>
-          </button>
-
-        </div>
-
-      </section>
+            WHAT WILL YOU DO?
+          </div>
 
 
-      <!-- ============================== -->
-      <!-- COUNTDOWN -->
-      <!-- ============================== -->
+          <div class="choice-buttons">
 
-      <section
-        id="countdown-area"
-        aria-live="polite"
-        hidden
-      >
-
-        <p id="countdown-label">
-          GET READY
-        </p>
-
-        <p id="countdown-number">
-          3
-        </p>
-
-        <p class="countdown-subtitle">
-          THE EYES ARE WATCHING
-        </p>
-
-      </section>
+            <button
+              id="choice-open"
+              type="button"
+              aria-label="Choose open"
+            >
+              👀 OPEN
+            </button>
 
 
-      <!-- ============================== -->
-      <!-- REVEAL -->
-      <!-- ============================== -->
+            <button
+              id="choice-closed"
+              type="button"
+              aria-label="Choose closed"
+            >
+              😑 CLOSED
+            </button>
 
-      <section
-        id="reveal-area"
-        aria-live="polite"
-        hidden
-      >
+          </div>
 
-        <div class="reveal-heading">
-          <span aria-hidden="true">◆</span>
-          REVEAL
-          <span aria-hidden="true">◆</span>
-        </div>
-
-        <p id="reveal-system-state"></p>
-
-        <p id="reveal-survival-state"></p>
-
-        <p id="reveal-point-state"></p>
-
-        <p id="reveal-caught-state"></p>
-
-      </section>
+        </section>
 
 
-      <!-- ============================== -->
-      <!-- RESULT STATES -->
-      <!-- ============================== -->
+        <!-- COUNTDOWN -->
 
-      <section id="result-states" hidden>
+        <section
+          id="countdown-area"
+          class="countdown-area"
+          aria-live="assertive"
+          hidden
+        >
+
+          <div
+            id="countdown-number"
+            class="countdown-number"
+          >
+            3
+          </div>
+
+        </section>
+
+
+        <!-- REVEAL -->
+
+        <section
+          id="reveal-area"
+          class="reveal-area"
+          aria-labelledby="reveal-title"
+          hidden
+        >
+
+          <div
+            id="reveal-title"
+            class="reveal-title"
+          >
+            🎰 RESULT
+          </div>
+
+
+          <div
+            id="reveal-system-state"
+            class="reveal-system-state"
+            aria-live="polite"
+          >
+          </div>
+
+
+          <div
+            id="reveal-survival-state"
+            class="reveal-survival-state"
+          >
+          </div>
+
+
+          <div
+            id="reveal-point-state"
+            class="reveal-point-state"
+          >
+          </div>
+
+
+          <div
+            id="reveal-caught-state"
+            class="reveal-caught-state"
+          >
+          </div>
+
+        </section>
+
+
+        <!-- RESULT STATES -->
+
+        <section
+          id="result-states"
+          class="result-states"
+          aria-live="polite"
+          hidden
+        >
+
+          <div
+            id="result-safe"
+            class="result-safe"
+            hidden
+          >
+            YOU SURVIVED.
+          </div>
+
+
+          <div
+            id="result-point"
+            class="result-point"
+            hidden
+          >
+            +1 POINT
+          </div>
+
+
+          <div
+            id="result-closed-safe"
+            class="result-closed-safe"
+            hidden
+          >
+            SAFE.
+            <br>
+            PRESS SPACE TO CONTINUE.
+          </div>
+
+
+          <div
+            id="result-game-over"
+            class="result-game-over"
+            hidden
+          >
+            GAME OVER.
+          </div>
+
+        </section>
+
+
+        <!-- STATUS / ROAST -->
 
         <div
-          id="result-safe"
-          class="result-container result-neutral"
-          hidden
-        >
-          <p>
-            You played it safe. No point earned, but you survived.
-          </p>
-        </div>
-
-
-        <div
-          id="result-point"
-          class="result-container result-success"
-          hidden
-        >
-          <p>
-            Bold move — you claimed OPEN and got away with it. +1 point!
-          </p>
-        </div>
-
-
-        <div
-          id="result-closed-safe"
-          class="result-container result-safe"
-          hidden
-        >
-          <p>
-            You claimed CLOSED. You're safe, but no point this round.
-          </p>
-        </div>
-
-
-        <div
-          id="result-game-over"
-          class="result-container result-danger"
-          hidden
-        >
-          <p>
-            Eye contact detected. You've been caught.
-          </p>
-        </div>
-
-      </section>
-
-
-      <!-- ============================== -->
-      <!-- STATUS -->
-      <!-- ============================== -->
-
-      <p
-        id="status-message"
-        aria-live="polite"
-      ></p>
-
-
-      <!-- ============================== -->
-      <!-- CONTROLS -->
-      <!-- ============================== -->
-
-      <section
-        id="game-controls"
-        aria-labelledby="controls-label"
-      >
-
-        <h2 id="controls-label">
-          CONTROLS
-        </h2>
-
-        <ul id="controls-list">
-
-          <li>
-            <kbd>ENTER</kbd>
-            <span>Claim OPEN</span>
-          </li>
-
-          <li>
-            <kbd>SPACE</kbd>
-            <span>Claim CLOSED</span>
-          </li>
-
-        </ul>
-
-      </section>
-
-
-      <!-- ============================== -->
-      <!-- HONOR SYSTEM -->
-      <!-- ============================== -->
-
-      <aside
-        id="honor-system-notice"
-        class="honor-system"
-        aria-labelledby="honor-system-title"
-      >
-
-        <p
-          id="honor-system-title"
-          class="honor-system-title"
-        >
-          <span aria-hidden="true">🔐</span>
-          HONOR SYSTEM ACTIVE
-        </p>
-
-        <p class="honor-system-message">
-          We have absolutely no idea if you're telling the truth.
-        </p>
-
-        <p class="honor-system-support">
-          Choose honestly. We literally cannot check.
-        </p>
-
-      </aside>
-
-    </main>
-
-  </section>
-
-
-  <!-- ============================== -->
-  <!-- GAME OVER SCREEN -->
-  <!-- ============================== -->
-
-  <section
-    id="game-over-screen"
-    class="screen game-over-screen"
-    hidden
-    aria-labelledby="game-over-heading"
-  >
-
-    <header>
-
-      <p
-        class="game-over-icon"
-        aria-hidden="true"
-      >
-        💀
-      </p>
-
-      <p class="game-over-kicker">
-        ◆ CASINO SESSION TERMINATED ◆
-      </p>
-
-      <h1 id="game-over-heading">
-        GAME OVER
-      </h1>
-
-      <p
-        id="game-over-message"
-        aria-live="assertive"
-        role="status"
-      >
-        EYE CONTACT DETECTED
-      </p>
-
-      <p id="game-over-submessage">
-        You looked. The system looked. That was a mistake.
-      </p>
-
-    </header>
-
-
-    <main>
-
-      <div class="final-stats">
-
-        <div class="final-stat">
-          <span>SCORE</span>
-          <strong id="final-score-value">0</strong>
-        </div>
-
-
-        <div class="final-stat">
-          <span>ROUNDS</span>
-          <strong id="rounds-survived-value">0</strong>
-        </div>
-
-
-        <div class="final-stat final-stat-high">
-          <span>HIGH SCORE</span>
-          <strong id="final-high-score-value">0</strong>
-        </div>
-
-
-        <p
-          id="new-high-score-message"
-          class="new-high-score-message"
-          hidden
+          id="status-message"
+          class="status-message"
+          role="status"
           aria-live="polite"
         >
-          🏆 NEW HIGH SCORE!
-        </p>
+        </div>
+
+
+        <!-- CONTROLS -->
+
+        <section
+          class="controls"
+          aria-labelledby="controls-title"
+        >
+
+          <div
+            id="controls-title"
+            class="controls-title"
+          >
+            KEYBOARD CONTROLS
+          </div>
+
+
+          <div class="controls-list">
+
+            <span>
+              ENTER = CLAIM OPEN
+            </span>
+
+            <span>
+              SPACE = CLAIM CLOSED
+            </span>
+
+            <span>
+              R = RESTART
+            </span>
+
+          </div>
+
+        </section>
+
+
+        <div class="honor-system">
+
+          HONOR SYSTEM ACTIVE.<br>
+          THE MACHINE CANNOT SEE YOU.
+
+        </div>
 
       </div>
 
-
-      <button
-        id="restart-button"
-        type="button"
-      >
-        <span aria-hidden="true">↻</span>
-        PLAY AGAIN
-      </button>
+    </section>
 
 
-      <p id="restart-instruction">
-        Press <kbd>R</kbd> to play again
-      </p>
+    <!-- =================================================== -->
+    <!-- GAME OVER SCREEN                                     -->
+    <!-- =================================================== -->
 
-    </main>
+    <section
+      id="game-over-screen"
+      class="screen"
+      aria-labelledby="game-over-heading"
+      hidden
+    >
 
-  </section>
+      <div class="panel">
 
 
-  <!-- ============================== -->
-  <!-- JAVASCRIPT -->
-  <!-- ============================== -->
+        <h1
+          id="game-over-heading"
+          class="game-over-heading"
+        >
+          GAME OVER
+        </h1>
 
-  <script src="script.js" defer></script>
+
+        <div
+          id="game-over-message"
+          class="game-over-message"
+        >
+          EYE CONTACT DETECTED
+        </div>
+
+
+        <p
+          id="game-over-submessage"
+          class="game-over-submessage"
+        >
+        </p>
+
+
+        <!-- FINAL STATS -->
+
+        <div class="final-stats">
+
+
+          <div class="final-stat">
+
+            <span class="final-stat-label">
+              FINAL SCORE
+            </span>
+
+            <span
+              id="final-score-value"
+              class="final-stat-value"
+            >
+              0
+            </span>
+
+          </div>
+
+
+          <div class="final-stat">
+
+            <span class="final-stat-label">
+              ROUNDS SURVIVED
+            </span>
+
+            <span
+              id="rounds-survived-value"
+              class="final-stat-value"
+            >
+              0
+            </span>
+
+          </div>
+
+
+          <div class="final-stat">
+
+            <span class="final-stat-label">
+              HIGH SCORE
+            </span>
+
+            <span
+              id="final-high-score-value"
+              class="final-stat-value"
+            >
+              0
+            </span>
+
+          </div>
+
+
+        </div>
+
+
+        <div
+          id="new-high-score-message"
+          hidden
+        >
+          🏆 NEW HIGH SCORE!
+        </div>
+
+
+        <button
+          id="restart-button"
+          type="button"
+        >
+          ↻ PLAY AGAIN
+        </button>
+
+
+        <div class="honor-system">
+
+          THE EYES HAVE WON.<br>
+          BETTER LUCK NEXT ROUND.
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ===================================================== -->
+  <!-- SCRIPT                                                 -->
+  <!-- ===================================================== -->
+
+  <script
+    src="script.js"
+    defer
+  ></script>
 
 </body>
+
 </html>

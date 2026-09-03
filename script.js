@@ -18,11 +18,21 @@ let continueKey = null;
 
 
 // ==============================
+// OVERLAY STATE
+// ==============================
+
+let resultOverlayTimeout = null;
+let resultOverlay = null;
+
+
+// ==============================
 // LIGHTWEIGHT ARCADE SOUNDS
 // ==============================
 
 let audioContext = null;
 let audioMaster = null;
+
+const activeAudioOscillators = new Set();
 
 
 function initAudio() {
@@ -56,16 +66,33 @@ function initAudio() {
 
   } catch (error) {
 
-    /*
-      Sound is optional.
-      If the browser does not support
-      Web Audio, the game still works.
-    */
-
     audioContext = null;
     audioMaster = null;
 
   }
+
+}
+
+
+function stopAllAudio() {
+
+  activeAudioOscillators.forEach(
+    (oscillator) => {
+
+      try {
+
+        oscillator.stop();
+
+      } catch (error) {
+
+        // Already stopped.
+
+      }
+
+    }
+  );
+
+  activeAudioOscillators.clear();
 
 }
 
@@ -88,11 +115,6 @@ function playTone(
 
 
   try {
-
-    /*
-      Resume the audio context if the
-      browser initially suspended it.
-    */
 
     if (
       audioContext.state ===
@@ -148,6 +170,24 @@ function playTone(
     gain.connect(audioMaster);
 
 
+    activeAudioOscillators.add(
+      oscillator
+    );
+
+
+    oscillator.addEventListener(
+      "ended",
+      () => {
+
+        activeAudioOscillators.delete(
+          oscillator
+        );
+
+      },
+      { once: true }
+    );
+
+
     oscillator.start();
 
 
@@ -157,10 +197,7 @@ function playTone(
 
   } catch (error) {
 
-    /*
-      Never allow audio errors to
-      interfere with the game.
-    */
+    // Audio must never break the game.
 
   }
 
@@ -193,13 +230,6 @@ function playChoiceSound() {
 
 
 function playSpinSound() {
-
-  /*
-    Only ONE short sound when the reel
-    begins.
-
-    No continuous audio loop.
-  */
 
   playTone(
     180,
@@ -466,6 +496,16 @@ let lastRoastIndex = -1;
 
 function getRandomMessage(messageList) {
 
+  if (
+    !Array.isArray(messageList) ||
+    messageList.length === 0
+  ) {
+
+    return "";
+
+  }
+
+
   const randomIndex =
     Math.floor(
       Math.random() *
@@ -493,7 +533,9 @@ function getRandomRoast(category) {
   }
 
 
-  if (roastList.length === 1) {
+  if (
+    roastList.length === 1
+  ) {
 
     lastRoastIndex = 0;
 
@@ -534,9 +576,7 @@ function getRandomRoast(category) {
 function showRoast(message) {
 
   if (!message) {
-
     return;
-
   }
 
 
@@ -764,6 +804,483 @@ const restartButton =
 
 
 // ==============================
+// FULLSCREEN
+// ==============================
+
+const fullscreenButton =
+  document.getElementById(
+    "fullscreen-button"
+  );
+
+
+function updateFullscreenButton() {
+
+  if (!fullscreenButton) {
+    return;
+  }
+
+
+  if (
+    document.fullscreenElement
+  ) {
+
+    fullscreenButton.textContent =
+      "⛶ EXIT FULLSCREEN";
+
+    fullscreenButton.setAttribute(
+      "aria-label",
+      "Exit fullscreen"
+    );
+
+    fullscreenButton.setAttribute(
+      "title",
+      "Exit fullscreen"
+    );
+
+  } else {
+
+    fullscreenButton.textContent =
+      "⛶ FULLSCREEN";
+
+    fullscreenButton.setAttribute(
+      "aria-label",
+      "Enter fullscreen"
+    );
+
+    fullscreenButton.setAttribute(
+      "title",
+      "Enter fullscreen"
+    );
+
+  }
+
+}
+
+
+if (fullscreenButton) {
+
+  fullscreenButton.addEventListener(
+    "click",
+    async () => {
+
+      try {
+
+        if (
+          document.fullscreenElement
+        ) {
+
+          await document.exitFullscreen();
+
+        } else if (
+          document.documentElement
+            .requestFullscreen
+        ) {
+
+          await document.documentElement
+            .requestFullscreen();
+
+        }
+
+      } catch (error) {
+
+        console.warn(
+          "Fullscreen was not allowed.",
+          error
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+document.addEventListener(
+  "fullscreenchange",
+  updateFullscreenButton
+);
+
+
+updateFullscreenButton();
+
+
+// ==============================
+// RESULT OVERLAY
+// ==============================
+
+function createResultOverlay() {
+
+  if (resultOverlay) {
+    return;
+  }
+
+
+  resultOverlay =
+    document.createElement(
+      "div"
+    );
+
+
+  resultOverlay.id =
+    "result-overlay";
+
+
+  resultOverlay.innerHTML = `
+    <div id="result-overlay-text">
+      <span id="result-overlay-main"></span>
+      <span id="result-overlay-sub"></span>
+    </div>
+  `;
+
+
+  resultOverlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(10, 6, 20, 0.96);
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition:
+      opacity 0.12s steps(2, end);
+  `;
+
+
+  const text =
+    resultOverlay.querySelector(
+      "#result-overlay-text"
+    );
+
+
+  text.style.cssText = `
+    padding: 30px;
+
+    text-align: center;
+
+    font-family:
+      "Courier New",
+      monospace;
+
+    font-size:
+      clamp(3rem, 10vw, 10rem);
+
+    font-weight: 900;
+
+    line-height: 0.9;
+
+    letter-spacing: 6px;
+
+    transform: scale(0.65);
+
+    transition:
+      transform 0.16s steps(2, end);
+  `;
+
+
+  const main =
+    resultOverlay.querySelector(
+      "#result-overlay-main"
+    );
+
+
+  main.style.cssText = `
+    display: block;
+  `;
+
+
+  const sub =
+    resultOverlay.querySelector(
+      "#result-overlay-sub"
+    );
+
+
+  sub.style.cssText = `
+    display: block;
+
+    margin-top: 24px;
+
+    font-size: 0.42em;
+
+    letter-spacing: 8px;
+  `;
+
+
+  document.body.appendChild(
+    resultOverlay
+  );
+
+}
+
+
+function showResultOverlay(
+  type,
+  duration,
+  onComplete = null
+) {
+
+  createResultOverlay();
+
+
+  if (
+    resultOverlayTimeout !== null
+  ) {
+
+    clearTimeout(
+      resultOverlayTimeout
+    );
+
+    resultOverlayTimeout = null;
+
+  }
+
+
+  const main =
+    resultOverlay.querySelector(
+      "#result-overlay-main"
+    );
+
+  const sub =
+    resultOverlay.querySelector(
+      "#result-overlay-sub"
+    );
+
+  const text =
+    resultOverlay.querySelector(
+      "#result-overlay-text"
+    );
+
+
+  // ==============================
+  // EYE CONTACT
+  // ==============================
+
+  if (
+    type === "eye-contact"
+  ) {
+
+    main.textContent =
+      "EYE CONTACT";
+
+    sub.textContent =
+      "DETECTED";
+
+
+    text.style.color =
+      "#ff2bd6";
+
+    text.style.textShadow =
+      `
+        6px 6px 0 #00f0ff,
+        -4px -4px 0 #ff2bd6
+      `;
+
+    sub.style.color =
+      "#00f0ff";
+
+    sub.style.textShadow =
+      "4px 4px 0 #ff2bd6";
+
+  }
+
+
+  // ==============================
+  // POINT
+  // ==============================
+
+  if (
+    type === "point"
+  ) {
+
+    main.textContent =
+      "+1 POINT!";
+
+    sub.textContent =
+      "NICE MOVE";
+
+
+    text.style.color =
+      "#00f0ff";
+
+    text.style.textShadow =
+      `
+        5px 5px 0 #ff2bd6,
+        -3px -3px 0 #00f0ff
+      `;
+
+    sub.style.color =
+      "#ff2bd6";
+
+    sub.style.textShadow =
+      "3px 3px 0 #00f0ff";
+
+  }
+
+
+  // ==============================
+  // SAFE
+  // ==============================
+
+  if (
+    type === "safe"
+  ) {
+
+    main.textContent =
+      "SAFE!";
+
+    sub.textContent =
+      "EYES CLOSED";
+
+
+    text.style.color =
+      "#00f0ff";
+
+    text.style.textShadow =
+      `
+        5px 5px 0 #ff2bd6,
+        -3px -3px 0 #00f0ff
+      `;
+
+    sub.style.color =
+      "#ff2bd6";
+
+    sub.style.textShadow =
+      "3px 3px 0 #00f0ff";
+
+  }
+
+
+  // ==============================
+  // SHOW
+  // ==============================
+
+  resultOverlay.style.opacity =
+    "1";
+
+  resultOverlay.style.pointerEvents =
+    "auto";
+
+
+  text.style.transform =
+    "scale(1)";
+
+
+  // ==============================
+  // SINGLE TIMER
+  // ==============================
+
+  resultOverlayTimeout =
+    setTimeout(() => {
+
+      resultOverlayTimeout = null;
+
+      hideResultOverlay();
+
+
+      if (
+        typeof onComplete ===
+        "function"
+      ) {
+
+        onComplete();
+
+      }
+
+    }, duration);
+
+}
+
+
+function hideResultOverlay() {
+
+  if (!resultOverlay) {
+    return;
+  }
+
+
+  resultOverlay.style.opacity =
+    "0";
+
+  resultOverlay.style.pointerEvents =
+    "none";
+
+
+  const text =
+    resultOverlay.querySelector(
+      "#result-overlay-text"
+    );
+
+
+  text.style.transform =
+    "scale(0.65)";
+
+}
+
+
+// ==============================
+// TIMER CLEANUP
+// ==============================
+
+function clearActiveTimers() {
+
+  if (
+    countdownInterval !== null
+  ) {
+
+    clearInterval(
+      countdownInterval
+    );
+
+    countdownInterval = null;
+
+  }
+
+
+  if (
+    reelAnimation !== null
+  ) {
+
+    clearTimeout(
+      reelAnimation
+    );
+
+    reelAnimation = null;
+
+  }
+
+
+  if (
+    resultOverlayTimeout !== null
+  ) {
+
+    clearTimeout(
+      resultOverlayTimeout
+    );
+
+    resultOverlayTimeout = null;
+
+  }
+
+
+  isCountdownActive =
+    false;
+
+  isReelSpinning =
+    false;
+
+
+  hideResultOverlay();
+
+}
+
+
+// ==============================
 // HIGH SCORE FUNCTIONS
 // ==============================
 
@@ -850,7 +1367,9 @@ function checkForNewHighScore() {
     highScore;
 
 
-  if (score > highScore) {
+  if (
+    score > highScore
+  ) {
 
     highScore = score;
 
@@ -909,6 +1428,7 @@ function prepareSlotReel() {
 
   systemEyeVisual.style.transform =
     "translateY(0)";
+
 }
 
 
@@ -1007,13 +1527,9 @@ function startSlotReelAnimation() {
   }
 
 
-  isReelSpinning = true;
+  isReelSpinning =
+    true;
 
-
-  /*
-    Only one tiny sound.
-    No audio loop.
-  */
 
   playSpinSound();
 
@@ -1038,11 +1554,6 @@ function startSlotReelAnimation() {
 
   prepareSlotReel();
 
-
-  /*
-    Force layout before applying
-    the reel transition.
-  */
 
   void systemEyeVisual.offsetHeight;
 
@@ -1071,14 +1582,17 @@ function startSlotReelAnimation() {
 
 function finishSlotReelAnimation() {
 
-  if (!isReelSpinning) {
+  if (
+    !isReelSpinning
+  ) {
 
     return;
 
   }
 
 
-  isReelSpinning = false;
+  isReelSpinning =
+    false;
 
 
   if (
@@ -1111,11 +1625,10 @@ function finishSlotReelAnimation() {
 
 
   /*
-    The animation NEVER decides
-    the system result.
+    systemChoice was already decided
+    before the reel animation started.
 
-    systemChoice was already selected
-    before the animation started.
+    The reel only reveals it.
   */
 
   systemEyeState.textContent =
@@ -1182,7 +1695,8 @@ function resetSlotReel() {
   }
 
 
-  isReelSpinning = false;
+  isReelSpinning =
+    false;
 
 
   systemSlotMachine.classList.remove(
@@ -1209,13 +1723,19 @@ function resetSlotReel() {
 
 function startGame() {
 
-  /*
-    Initialize audio from the user's
-    click/ENTER action.
+  if (
+    startScreen.hidden
+  ) {
 
-    This is the safest browser-compatible
-    place to start Web Audio.
-  */
+    return;
+
+  }
+
+
+  clearActiveTimers();
+
+  stopAllAudio();
+
 
   initAudio();
 
@@ -1234,15 +1754,14 @@ function startGame() {
   systemChoice = null;
 
 
-  countdownInterval = null;
+  resultProcessed =
+    false;
 
-  isCountdownActive = false;
+  gameOver =
+    false;
 
-  resultProcessed = false;
-
-  gameOver = false;
-
-  continueKey = null;
+  continueKey =
+    null;
 
 
   startScreen.hidden =
@@ -1262,12 +1781,12 @@ function startGame() {
   updateHighScoreDisplay();
 
 
+  startRound();
+
+
   showRoast(
     getRandomRoast("reveal")
   );
-
-
-  startRound();
 
 }
 
@@ -1283,11 +1802,14 @@ function startRound() {
   systemChoice = null;
 
 
-  isCountdownActive = false;
+  isCountdownActive =
+    false;
 
-  resultProcessed = false;
+  resultProcessed =
+    false;
 
-  continueKey = null;
+  continueKey =
+    null;
 
 
   systemEyeState.textContent =
@@ -1363,20 +1885,60 @@ function startRound() {
 
 function startNextRound() {
 
+  /*
+    Only surviving rounds can continue.
+  */
+
   if (
-    resultProcessed &&
-    !gameOver
+    !resultProcessed ||
+    gameOver ||
+    (
+      continueKey !== "ENTER" &&
+      continueKey !== "SPACE"
+    )
   ) {
 
-    roundNumber += 1;
-
-    startRound();
-
-    showRoast(
-      getRandomRoast("reveal")
-    );
+    return;
 
   }
+
+
+  /*
+    Hide any remaining result overlay.
+  */
+
+  hideResultOverlay();
+
+
+  /*
+    Immediately lock the current result
+    so repeated key presses cannot create
+    multiple rounds.
+  */
+
+  resultProcessed =
+    false;
+
+  continueKey =
+    null;
+
+
+  roundNumber += 1;
+
+
+  /*
+    NO 3-SECOND WAIT.
+
+    The next round begins immediately
+    when ENTER or SPACE is pressed.
+  */
+
+  startRound();
+
+
+  showRoast(
+    getRandomRoast("reveal")
+  );
 
 }
 
@@ -1386,11 +1948,6 @@ function startNextRound() {
 // ==============================
 
 function selectPlayerChoice(choice) {
-
-  /*
-    Prevent choices while the round
-    is already running.
-  */
 
   if (
     playerChoice !== null ||
@@ -1404,12 +1961,19 @@ function selectPlayerChoice(choice) {
   }
 
 
-  playerChoice = choice;
+  if (
+    choice !== "OPEN" &&
+    choice !== "CLOSED"
+  ) {
+
+    return;
+
+  }
 
 
-  /*
-    Short button/choice sound.
-  */
+  playerChoice =
+    choice;
+
 
   playChoiceSound();
 
@@ -1456,8 +2020,6 @@ function selectPlayerChoice(choice) {
 
     Decide the system result BEFORE
     the reel animation starts.
-
-    The reel only reveals it.
   */
 
   systemChoice =
@@ -1512,11 +2074,6 @@ function startCountdown() {
   );
 
 
-  /*
-    Start the vertical casino reel
-    immediately.
-  */
-
   startSlotReelAnimation();
 
 
@@ -1555,11 +2112,6 @@ function startCountdown() {
         false;
 
 
-      /*
-        Reel lasts 2.65 seconds.
-        Countdown lasts 3 seconds.
-      */
-
       if (
         isReelSpinning
       ) {
@@ -1595,11 +2147,6 @@ function revealResult() {
 
   }
 
-
-  /*
-    Make absolutely sure the reel
-    has finished before the result.
-  */
 
   finishSlotReelAnimation();
 
@@ -1691,10 +2238,30 @@ function calculateResult() {
       true;
 
 
+    continueKey =
+      null;
+
+
     playGameOverSound();
 
 
-    showGameOver();
+    /*
+      ONLY GAME OVER waits.
+
+      EYE CONTACT DETECTED stays
+      for 2 seconds, then Game Over
+      automatically appears.
+    */
+
+    showResultOverlay(
+      "eye-contact",
+      2000,
+      () => {
+
+        showGameOver();
+
+      }
+    );
 
 
     return;
@@ -1714,10 +2281,10 @@ function calculateResult() {
     score += 1;
 
 
-    playPointSound();
-
-
     roundsSurvived += 1;
+
+
+    playPointSound();
 
 
     revealSurvivalState.textContent =
@@ -1749,6 +2316,19 @@ function calculateResult() {
 
     showRoast(
       `${getRandomRoast("point")} — ${funnyMessage}`
+    );
+
+
+    /*
+      +1 POINT stays on screen briefly.
+
+      After it disappears, the player
+      can press ENTER immediately.
+    */
+
+    showResultOverlay(
+      "point",
+      1000
     );
 
 
@@ -1797,6 +2377,19 @@ function calculateResult() {
     );
 
 
+    /*
+      SAFE stays on screen briefly.
+
+      After it disappears, the player
+      can press SPACE immediately.
+    */
+
+    showResultOverlay(
+      "safe",
+      1000
+    );
+
+
     return;
 
   }
@@ -1841,6 +2434,12 @@ function calculateResult() {
       `${getRandomRoast("safe")} — ${funnyMessage}`
     );
 
+
+    showResultOverlay(
+      "safe",
+      1000
+    );
+
   }
 
 }
@@ -1851,6 +2450,23 @@ function calculateResult() {
 // ==============================
 
 function showGameOver() {
+
+  if (
+    !gameOver
+  ) {
+
+    return;
+
+  }
+
+
+  /*
+    Make absolutely sure the overlay
+    is no longer blocking the screen.
+  */
+
+  hideResultOverlay();
+
 
   const isNewHighScore =
     checkForNewHighScore();
@@ -1905,30 +2521,9 @@ function showGameOver() {
 
 function restartGame() {
 
-  if (
-    countdownInterval !== null
-  ) {
+  clearActiveTimers();
 
-    clearInterval(
-      countdownInterval
-    );
-
-    countdownInterval = null;
-
-  }
-
-
-  if (
-    reelAnimation !== null
-  ) {
-
-    clearTimeout(
-      reelAnimation
-    );
-
-    reelAnimation = null;
-
-  }
+  stopAllAudio();
 
 
   score = 0;
@@ -1942,12 +2537,6 @@ function restartGame() {
 
   systemChoice = null;
 
-
-  isCountdownActive =
-    false;
-
-  isReelSpinning =
-    false;
 
   resultProcessed =
     false;
@@ -2029,6 +2618,19 @@ document.addEventListener(
   "keydown",
   (event) => {
 
+    /*
+      Ignore browser key auto-repeat.
+    */
+
+    if (
+      event.repeat
+    ) {
+
+      return;
+
+    }
+
+
     // ==========================
     // ENTER
     // ==========================
@@ -2038,12 +2640,29 @@ document.addEventListener(
     ) {
 
       /*
-        Start game.
+        Let focused buttons handle
+        their own native activation.
+      */
+
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest("button")
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+        ENTER = start game.
       */
 
       if (
         !startScreen.hidden
       ) {
+
+        event.preventDefault();
 
         startGame();
 
@@ -2053,15 +2672,43 @@ document.addEventListener(
 
 
       /*
-        Claim OPEN.
+        Game Over has no ENTER
+        continuation.
       */
 
       if (
-        !gameOver &&
-        !isCountdownActive &&
-        !isReelSpinning &&
+        gameOver
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+        ENTER does nothing during
+        countdown/reel.
+      */
+
+      if (
+        isCountdownActive ||
+        isReelSpinning
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+        ENTER = OPEN.
+      */
+
+      if (
         playerChoice === null
       ) {
+
+        event.preventDefault();
 
         selectPlayerChoice(
           "OPEN"
@@ -2073,16 +2720,16 @@ document.addEventListener(
 
 
       /*
-        Continue after
+        ENTER = next round after
         OPEN + CLOSED.
       */
 
       if (
-        !gameOver &&
-        !isCountdownActive &&
-        !isReelSpinning &&
+        resultProcessed &&
         continueKey === "ENTER"
       ) {
+
+        event.preventDefault();
 
         startNextRound();
 
@@ -2101,17 +2748,63 @@ document.addEventListener(
       event.code === "Space"
     ) {
 
+      /*
+        Let focused buttons handle
+        their own native activation.
+      */
+
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest("button")
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+        Prevent browser page scrolling.
+      */
+
       event.preventDefault();
 
 
       /*
-        Claim CLOSED.
+        SPACE is ignored on start screen
+        and Game Over screen.
       */
 
       if (
-        !gameOver &&
-        !isCountdownActive &&
-        !isReelSpinning &&
+        !startScreen.hidden ||
+        !gameOverScreen.hidden
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+        SPACE does nothing during
+        countdown/reel.
+      */
+
+      if (
+        isCountdownActive ||
+        isReelSpinning
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+        SPACE = CLOSED.
+      */
+
+      if (
         playerChoice === null
       ) {
 
@@ -2125,14 +2818,12 @@ document.addEventListener(
 
 
       /*
-        Continue after
-        CLOSED result.
+        SPACE = next round after
+        either CLOSED result.
       */
 
       if (
-        !gameOver &&
-        !isCountdownActive &&
-        !isReelSpinning &&
+        resultProcessed &&
         continueKey === "SPACE"
       ) {
 
@@ -2153,6 +2844,8 @@ document.addEventListener(
       event.key.toLowerCase() === "r"
     ) {
 
+      event.preventDefault();
+
       restartGame();
 
       return;
@@ -2169,8 +2862,7 @@ document.addEventListener(
     ) {
 
       /*
-        Existing SHIFT behavior
-        remains unchanged.
+        SHIFT remains unchanged.
       */
 
       return;
