@@ -3,13 +3,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eye Roulette</title>
+  <title>Eye Roulette 👀</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>Eye Roulette</h1>
+  <!-- ============================== -->
+  <!-- START SCREEN -->
+  <!-- ============================== -->
+  <section id="start-screen" class="screen">
+    <header>
+      <h1 id="game-title">EYE ROULETTE <span aria-hidden="true">👀</span></h1>
+      <p id="tagline">A game of nerve, honesty, and questionable decision-making.</p>
+    </header>
 
-  <script src="script.js"></script>
+    <main>
+      <p id="how-to-play">
+        Each round, claim whether your eyes are open or closed, then see if the
+        system catches you making eye contact. Survive as many rounds as you can
+        without getting caught.
+      </p>
+
+      <p id="honor-note-start" class="honor-note">
+        This game runs entirely on the honor system — there's no camera watching you.
+      </p>
+
+      <button id="start-button" type="button">Start Game</button>
+
+      <p id="start-instruction">Press <kbd>ENTER</kbd> to start</p>
+    </main>
+  </section>
+
+  <!-- ============================== -->
+  <!-- GAME SCREEN -->
+  <!-- ============================== -->
+  <section id="game-screen" class="screen" hidden>
+    <header id="game-info">
+      <p id="round-counter">Round: <span id="round-number">1</span></p>
+      <p id="score-display">Score: <span id="current-score">0</span></p>
+      <p id="high-score-display">High Score: <span id="high-score">0</span></p>
+    </header>
+
+    <main>
+
+      <!-- System / computer eyes area -->
+      <section id="system-area" aria-labelledby="system-label">
+        <h2 id="system-label">System Eyes</h2>
+        <div id="system-eye-visual" aria-hidden="true">👀</div>
+        <p id="system-eye-state">???</p>
+      </section>
+
+      <!-- Player choice area -->
+      <section id="player-choice-area" aria-labelledby="player-choice-label">
+        <h2 id="player-choice-label">Your Claim</h2>
+        <button id="choice-open" class="choice-button" type="button">OPEN 👀</button>
+        <button id="choice-closed" class="choice-button" type="button">CLOSED 😑</button>
+      </section>
+
+      <!-- Countdown -->
+      <section id="countdown-area" aria-live="polite">
+        <h2 id="countdown-label">Countdown</h2>
+        <p id="countdown-number">3</p>
+      </section>
+
+      <!-- Reveal / result -->
+      <section id="reveal-area" aria-live="polite">
+        <h2 id="reveal-label">Reveal</h2>
+        <p id="reveal-system-state"></p>
+        <p id="reveal-survival-state"></p>
+        <p id="reveal-point-state"></p>
+        <p id="reveal-caught-state"></p>
+      </section>
+
+      <!-- Result states (JS will show/hide these later) -->
+      <section id="result-states">
+
+        <div id="result-safe" class="result-container" hidden>
+          <p>You played it safe. No point earned, but you survived.</p>
+        </div>
+
+        <div id="result-point" class="result-container" hidden>
+          <p>Bold move — you claimed OPEN and got away with it. +1 point!</p>
+        </div>
+
+        <div id="result-closed-safe" class="result-container" hidden>
+          <p>You claimed CLOSED. You're safe, but no point this round.</p>
+        </div>
+
+        <div id="result-game-over" class="result-container" hidden>
+          <p>Eye contact detected. You've been caught.</p>
+        </div>
+
+      </section>
+
+      <!-- Status / message area -->
+      <p id="status-message" aria-live="polite"></p>
+
+      <!-- Controls -->
+      <section id="game-controls" aria-labelledby="controls-label">
+        <h2 id="controls-label">Controls</h2>
+        <ul id="controls-list">
+          <li><kbd>ENTER</kbd> — Start / continue after an OPEN-risk round</li>
+          <li><kbd>O</kbd> — Claim eyes are OPEN</li>
+          <li><kbd>C</kbd> — Claim eyes are CLOSED</li>
+          <li><kbd>SPACE</kbd> — Continue after choosing CLOSED</li>
+          <li><kbd>SHIFT</kbd> — End the current game</li>
+          <li><kbd>R</kbd> — Restart after game over</li>
+        </ul>
+      </section>
+
+    </main>
+  </section>
+
+  <!-- ============================== -->
+  <!-- GAME OVER SCREEN -->
+  <!-- ============================== -->
+  <section id="game-over-screen" class="screen" hidden>
+    <header>
+      <h1 id="game-over-heading">GAME OVER</h1>
+      <p id="game-over-message">Eye contact detected. You've been caught.</p>
+    </header>
+
+    <main>
+      <p id="final-score">Final Score: <span id="final-score-value">0</span></p>
+      <p id="rounds-survived">Rounds Survived: <span id="rounds-survived-value">0</span></p>
+      <p id="final-high-score">High Score: <span id="final-high-score-value">0</span></p>
+
+      <button id="restart-button" type="button">Restart</button>
+      <p id="restart-instruction">Press <kbd>R</kbd> to restart</p>
+    </main>
+  </section>
+
+  <!-- ============================== -->
+  <!-- HONOR SYSTEM NOTICE (GLOBAL) -->
+  <!-- ============================== -->
+  <footer id="honor-system-notice">
+    <p>🔐 HONOR SYSTEM ACTIVE — We have absolutely no idea if you're telling the truth.</p>
+  </footer>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
