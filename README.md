@@ -2,6 +2,10 @@
 
 
 
+
+
+
+
 # EYE ROULETTE 🎯
 
 
@@ -60,12 +64,11 @@ Or, if using VS Code, launch the project with Live Server and open the provided 
 For Software:
 
 # Screenshots (Add at least 3)
-c:\Users\Dell\Pictures\Screenshots\Start screen.png *Start screen that displays at the beginning*
-
-c:\Users\Dell\Pictures\Screenshots\Round 1.png
+<img width="1256" height="610" alt="Start screen" src="https://github.com/user-attachments/assets/089381cf-623a-4717-805a-5dd112342cf1" />
+*Start screen that displays at the beginning*
+<img width="1244" height="744" alt="Round 1" src="https://github.com/user-attachments/assets/a6fe7afc-a3cd-438e-99ce-7666f586624d" />
 *Game screen*
-
-c:\Users\Dell\Pictures\Screenshots\Score screen.png
+<img width="1314" height="765" alt="Score screen" src="https://github.com/user-attachments/assets/62226abe-2736-4258-bfb5-48e7a6e86182" />
 *Final screen displaying points*
 
 # Diagrams
@@ -74,7 +77,7 @@ c:\Users\Dell\Pictures\Screenshots\Score screen.png
 
 ### Project Demo
 # Video
-<video controls src="Demo video.mp4" title="Title"></video>
+https://github.com/user-attachments/assets/746e9f4e-cbe1-4814-be16-5a615ee39d27
 *The video demonstrates how the game works*
 
 
